@@ -41,8 +41,8 @@ export default function InfoPage() {
       <main>
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>About Our App</CardTitle>
-            <CardDescription>Learn what makes our app special</CardDescription>
+            <CardTitle>About GHL</CardTitle>
+            <CardDescription>The CRM that can do almost anything</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="mb-4">
@@ -55,7 +55,7 @@ export default function InfoPage() {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <Button variant="outline">
-                Learn More
+                GHL Academy
               </Button>
             </div>
           </CardContent>
@@ -188,7 +188,7 @@ export default function InfoPage() {
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="flex flex-col items-center">
-                <img src="/placeholder.svg?height=50&width=50" alt="Slack" className="mb-2" />
+                <img src="/Slack-logo.png" alt="Slack" className="mb-2 rounded-lg" height="200" width="200"/>
                 <span>Slack</span>
               </div>
               <div className="flex flex-col items-center">
@@ -274,6 +274,7 @@ export default function InfoPage() {
                         width: '100%',
                         height: '100%',
                         border: 'none',
+                        borderRadius: '10px',
                       }}
                     />
                   </div>

@@ -77,7 +77,7 @@ export function AppSidebar() {
           title: "Discounts",
           url: "/discounts",
           icon: DollarSign,
-          isActive: pathname === "/discounts"
+          isActive: pathname.startsWith("/discounts")
         }        
     ],
     applications: [
@@ -85,7 +85,7 @@ export function AppSidebar() {
         name: "GHL",
         url: "/dashboard/ghl",
         icon: SquareArrowUp,
-        isActive: false
+        isActive: pathname.startsWith("/dashboard/ghl")
       },
       {
         name: "Snappy Website Bots",
@@ -123,19 +123,19 @@ export function AppSidebar() {
         name: "Automations",
         url: "/dashboard/automations",
         icon: Bot,
-        isActive: pathname === "/dashboard/automations"
+        isActive: pathname.startsWith("/dashboard/automations")
       },
       {
         name: "Code Snippets",
         url: "/dashboard/snippets",
         icon: Code,
-        isActive: pathname === "/dashboard/snippets"
+        isActive: pathname.startsWith("/dashboard/snippets")
       },
       {
         name: "Documents",
         url: "/dashboard/documents",
         icon: FileStack,
-        isActive: pathname === "/dashboard/documents" || pathname.startsWith("/dashboard/documents/") 
+        isActive: pathname.startsWith("/dashboard/documents")
       },
     ],
     tools: [
@@ -143,7 +143,7 @@ export function AppSidebar() {
         name: "Prospecting",
         url: "/dashboard/prospecting",
         icon: Search,
-        isActive: pathname === "/dashboard/prospecting"
+        isActive: pathname.startsWith("/dashboard/prospecting")
       },
       {
         name: "Proposal Generator",
