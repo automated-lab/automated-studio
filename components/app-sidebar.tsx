@@ -14,10 +14,16 @@ import {
   SquareTerminal,
   Zap,
   LayoutDashboard,
+  LayoutGrid,
+  Atom,
+  SquareArrowUp,
+  Star,
+  Link,
+  Calendar1,
+  Percent,
+  DollarSign,
 } from "lucide-react"
 import { usePathname } from "next/navigation"
-import Link from "next/link"
-import { cn } from "@/lib/utils"
 import { User } from "@supabase/supabase-js"
 import { createClient } from "@/libs/supabase/client"
 import { useState, useEffect } from "react"
@@ -58,62 +64,56 @@ export function AppSidebar() {
       initials: (user?.email?.[0] || "").toUpperCase()
     },
     navMain: [
+        {
+          title: "Dashboard",
+          url: "/dashboard",
+          icon: LayoutDashboard,
+          isActive: pathname === "/dashboard"
+        },
+        {
+          title: "Discounts",
+          url: "/discounts",
+          icon: DollarSign,
+          isActive: pathname === "/discounts"
+        }        
+    ],
+    applications: [
       {
-        title: "Dashboard",
-        url: "/dashboard",
-        icon: LayoutDashboard,
-        isActive: pathname === "/dashboard"
-      },
-      {
-        title: "Applications",
+        name: "GHL",
         url: "#",
-        icon: BookOpen,
-        items: [
-          {
-            title: "GHL",
-            url: "#",
-          },
-          {
-            title: "Snappy Website Bots",
-            url: "#",
-          },
-          {
-            title: "Snappy Social Bots",
-            url: "#",
-          },
-          {
-            title: "Reviewr",
-            url: "#",
-          },
-          {
-            title: "Compressr",
-            url: "#",
-          },
-        ],
+        icon: SquareArrowUp,
+        isActive: false
       },
       {
-        title: "Settings",
+        name: "Snappy Website Bots",
         url: "#",
-        icon: Settings2,
-        items: [
-          {
-            title: "General",
-            url: "#",
-          },
-          {
-            title: "Team",
-            url: "#",
-          },
-          {
-            title: "Billing",
-            url: "#",
-          },
-          {
-            title: "Limits",
-            url: "#",
-          },
-        ],
+        icon: Bot,
+        isActive: false
       },
+      {
+        name: "Snappy Social Bots",
+        url: "#",
+        icon: Bot,
+        isActive: false
+      },
+      {
+        name: "Reviewr",
+        url: "#",
+        icon: Star,
+        isActive: false
+      },
+      {
+        name: "Compressr",
+        url: "#",
+        icon: Link,
+        isActive: false
+      },
+      {
+        name: "Book Me",
+        url: "#",
+        icon: Calendar1,
+        isActive: false
+      }
     ],
     resources: [
       {
@@ -153,7 +153,8 @@ export function AppSidebar() {
       <SidebarContent>
         <nav className="grid gap-1">
           <NavMain items={data.navMain} />
-          <NavProjects projects={data.resources} />
+          <NavProjects projects={data.applications} label="Applications" />
+          <NavProjects projects={data.resources} label="Resources" />
         </nav>
       </SidebarContent>
       <SidebarFooter>

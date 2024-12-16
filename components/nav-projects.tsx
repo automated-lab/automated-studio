@@ -16,44 +16,34 @@ import {
 
 import { cn } from "@/lib/utils"
 import { usePathname } from "next/navigation"
+import Link from "next/link"
 
-export function NavProjects({
-  projects,
-}: {
+interface NavProjectsProps {
   projects: {
     name: string
     url: string
     icon: LucideIcon
   }[]
-}) {
-  const { isMobile } = useSidebar()
-  const pathname = usePathname()
+  label: string
+}
+
+export function NavProjects({ projects, label }: NavProjectsProps) {
+  const sidebar = useSidebar()
 
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Resources</SidebarGroupLabel>
+    <SidebarGroup>
+      <SidebarGroupLabel>{label}</SidebarGroupLabel>
       <SidebarMenu>
         {projects.map((item) => (
           <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton 
-              asChild
-              className={cn(
-                pathname === item.url && "bg-accent text-accent-foreground"
-              )}
-            >
-              <a href={item.url}>
-                <item.icon />
+            <SidebarMenuButton asChild tooltip={item.name}>
+              <Link href={item.url}>
+                <item.icon className="h-4 w-4" />
                 <span>{item.name}</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}
-        <SidebarMenuItem>
-          <SidebarMenuButton className="text-sidebar-foreground/70">
-            <MoreHorizontal className="text-sidebar-foreground/70" />
-            <span>More</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
       </SidebarMenu>
     </SidebarGroup>
   )
