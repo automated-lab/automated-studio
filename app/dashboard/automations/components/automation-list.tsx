@@ -43,7 +43,7 @@ export function AutomationList({ selectedId, onSelect }: AutomationListProps) {
 
   if (loading) {
     return (
-      <div className="w-[550px] border-r h-full">
+      <div className="w-full md:w-[350px] lg:w-[550px] border-r h-full">
         <div className="h-full flex items-center justify-center text-muted-foreground">
           Loading automations...
         </div>
@@ -61,7 +61,7 @@ export function AutomationList({ selectedId, onSelect }: AutomationListProps) {
   }, {} as Record<string, Automation[]>)
 
   return (
-    <div className="w-[550px] border-r h-full">
+    <div className="w-full md:w-[350px] lg:w-[550px] border-r h-full">
       <div className="h-full overflow-y-auto">
         <div className="space-y-6 p-4">
           {Object.entries(groupedAutomations).map(([category, categoryAutomations]) => (

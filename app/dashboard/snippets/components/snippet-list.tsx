@@ -43,7 +43,7 @@ export function SnippetList({ selectedId, onSelect }: SnippetListProps) {
 
   if (loading) {
     return (
-      <div className="w-[550px] border-r h-full">
+      <div className="w-full md:w-[350px] lg:w-[550px] border-r h-full">
         <div className="h-full flex items-center justify-center text-muted-foreground">
           Loading snippets...
         </div>
@@ -62,7 +62,7 @@ export function SnippetList({ selectedId, onSelect }: SnippetListProps) {
   }, {} as Record<string, Snippet[]>)
 
   return (
-    <div className="w-[550px] border-r h-full">
+    <div className="w-full md:w-[350px] lg:w-[550px] border-r h-full">
       <div className="h-full overflow-y-auto">
         <div className="space-y-6 p-4">
           {Object.entries(groupedSnippets).map(([category, categorySnippets]) => (

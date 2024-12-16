@@ -32,82 +32,82 @@ export function DocumentContent({ document }: DocumentContentProps) {
 
   if (!document) {
     return (
-      <div className="flex-1 h-full">
-        <div className="h-full flex items-center justify-center text-muted-foreground">
-          Select a document to view its content
-        </div>
+      <div className="flex h-full items-center justify-center p-8 text-muted-foreground">
+        Select a document to view details
       </div>
     )
   }
 
   return (
-    <div className="flex-1 overflow-hidden">
-      <div className="h-full flex flex-col">
-        <div className="flex items-center p-6 border-b shrink-0">
-          <div className="flex-1">
-            <h2 className="text-lg font-semibold">{document.name}</h2>
-            <p className="text-sm text-muted-foreground">
-              {document.shortDescription}
-            </p>
+    <div className="h-full overflow-y-auto">
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full flex flex-col">
+          <div className="flex items-center p-6 border-b shrink-0">
+            <div className="flex-1">
+              <h2 className="text-lg font-semibold">{document.name}</h2>
+              <p className="text-sm text-muted-foreground">
+                {document.shortDescription}
+              </p>
+            </div>
           </div>
-        </div>
 
-        <div className="flex-1 overflow-y-auto">
-          <div className="p-6">
-            <div className="space-y-6">
+          <div className="flex-1 overflow-y-auto">
+            <div className="p-6">
+              <div className="space-y-6">
 
 
-              <div className="space-y-4">
-                <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-ul:text-foreground prose-li:text-foreground">
-                  <ReactMarkdown 
-                    remarkPlugins={[remarkGfm]}
-                    components={{
-                      a: ({ href, children }: { href?: string; children: React.ReactNode }) => (
-                        <a 
-                          href={href} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-primary hover:underline"
-                        >
-                          {children}
-                        </a>
-                      ),
-                    }}
-                  >
-                    {document.content}
-                  </ReactMarkdown>
-                </div>
-              </div>
-
-              {document.attachments && document.attachments.length > 0 && (
-                <>
-                  <Separator />
-                  <div>
-                    <h2 className="text-lg font-semibold mb-4">Attachments</h2>
-                    <div className="grid gap-4">
-                      {document.attachments.map((attachment: any) => (
-                        <div
-                          key={attachment.id}
-                          className="flex items-center justify-between p-4 border rounded-lg"
-                        >
-                          <div className="flex items-center gap-2">
-                            <FileText className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-sm">{attachment.filename}</span>
-                          </div>
-                          <Button 
-                            size="sm"
-                            onClick={() => handleDownload(attachment.url, attachment.filename)}
-                            className="flex items-center gap-2"
+                <div className="space-y-4">
+                  <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-ul:text-foreground prose-li:text-foreground">
+                    <ReactMarkdown 
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        a: ({ href, children }: { href?: string; children: React.ReactNode }) => (
+                          <a 
+                            href={href} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline"
                           >
-                            <Download className="w-4 h-4" />
-                            Download
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
+                            {children}
+                          </a>
+                        ),
+                      }}
+                    >
+                      {document.content}
+                    </ReactMarkdown>
                   </div>
-                </>
-              )}
+                </div>
+
+                {document.attachments && document.attachments.length > 0 && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h2 className="text-lg font-semibold mb-4">Attachments</h2>
+                      <div className="grid gap-4">
+                        {document.attachments.map((attachment: any) => (
+                          <div
+                            key={attachment.id}
+                            className="flex items-center justify-between p-4 border rounded-lg"
+                          >
+                            <div className="flex items-center gap-2">
+                              <FileText className="w-4 h-4 text-muted-foreground" />
+                              <span className="text-sm">{attachment.filename}</span>
+                            </div>
+                            <Button 
+                              size="sm"
+                              onClick={() => handleDownload(attachment.url, attachment.filename)}
+                              className="flex items-center gap-2"
+                            >
+                              <Download className="w-4 h-4" />
+                              Download
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>
