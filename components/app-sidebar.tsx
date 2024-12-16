@@ -6,6 +6,7 @@ import {
   BookOpen,
   Bot,
   Code,
+  FileText,
   Command,
   FileStack,
   GalleryVerticalEnd,
@@ -22,6 +23,8 @@ import {
   Calendar1,
   Percent,
   DollarSign,
+  Brain,
+  Search,
 } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { User } from "@supabase/supabase-js"
@@ -135,6 +138,32 @@ export function AppSidebar() {
         isActive: pathname === "/dashboard/documents" || pathname.startsWith("/dashboard/documents/") 
       },
     ],
+    tools: [
+      {
+        name: "Prospecting",
+        url: "/dashboard/prospecting",
+        icon: Search,
+        isActive: pathname === "/dashboard/prospecting"
+      },
+      {
+        name: "Proposal Generator",
+        url: "/dashboard/proposal-generator",
+        icon: FileText,
+        isActive: pathname === "/dashboard/proposal-generator"
+      },
+      {
+        name: "Bot Prompting",
+        url: "/dashboard/bot-prompting",
+        icon: Bot,
+        isActive: pathname === "/dashboard/bot-prompting"
+      },
+      {
+        name: "Bot Showcase Tool",
+        url: "/dashboard/bot-showcase",
+        icon: Bot,
+        isActive: pathname === "/dashboard/bot-showcase"
+      }
+    ]
   }
 
   return (
@@ -155,6 +184,7 @@ export function AppSidebar() {
           <NavMain items={data.navMain} />
           <NavProjects projects={data.applications} label="Applications" />
           <NavProjects projects={data.resources} label="Resources" />
+          <NavProjects projects={data.tools} label="Tools" />
         </nav>
       </SidebarContent>
       <SidebarFooter>
