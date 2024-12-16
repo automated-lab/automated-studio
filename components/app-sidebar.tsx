@@ -83,7 +83,7 @@ export function AppSidebar() {
     applications: [
       {
         name: "GHL",
-        url: "#",
+        url: "/dashboard/ghl",
         icon: SquareArrowUp,
         isActive: false
       },
