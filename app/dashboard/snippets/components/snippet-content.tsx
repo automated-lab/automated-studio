@@ -7,6 +7,7 @@ import { Clock, Download, FileText } from "lucide-react"
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import React from 'react'
+import Image from "next/image"
 
 interface SnippetContentProps {
   snippet: Snippet | null
@@ -80,6 +81,24 @@ export function SnippetContent({ snippet }: SnippetContentProps) {
                     </ReactMarkdown>
                   </div>
                 </div>
+
+                {snippet.image && (
+                  <>
+                    <Separator />
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-semibold">Example</h3>
+                      <div className="relative rounded-lg overflow-hidden">
+                        <Image 
+                          src={snippet.image[0].url} 
+                          alt="Snippet image" 
+                          width={1200}
+                          height={800}
+                          className="w-full"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 {snippet.attachments && snippet.attachments.length > 0 && (
                   <>

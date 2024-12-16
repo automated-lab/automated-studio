@@ -14,7 +14,10 @@ export type Automation = {
   attachments?: string[]
   timeToImplement: string
   lastModified: string
-  image?: string
+  image?: {
+    url: string;
+    id: string;
+  }[];
   category: string
   platform: string
   production: boolean
@@ -70,7 +73,7 @@ export const getAutomationById = async (id: string) => {
   }
 }
 
-export type Snippet = {
+export interface Snippet {
   id: string
   name: string
   shortDescription: string
@@ -79,7 +82,10 @@ export type Snippet = {
   attachments?: string[]
   timeToImplement: string
   lastModified: string
-  image?: string
+  image?: {
+    url: string;
+    id: string;
+  }[];
   language: string
   category: string
   production: boolean

@@ -6,6 +6,7 @@ import type { Automation } from "@/libs/airtable"
 import { Clock, Download, ExternalLink, PlayCircle, FileText, Rocket } from "lucide-react"
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import Image from "next/image"
 
 interface AutomationContentProps {
   automation: Automation | null
@@ -62,7 +63,7 @@ export function AutomationContent({ automation }: AutomationContentProps) {
               <Button variant="default" size="sm" asChild>
                 <a href={automation.videoUrl} target="_blank" rel="noopener noreferrer">
                   <PlayCircle className="mr-2 h-4 w-4" />
-                  External Video
+                  External Player
                 </a>
               </Button>
             )}
@@ -109,13 +110,32 @@ export function AutomationContent({ automation }: AutomationContentProps) {
               <>
                 <Separator />
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Tutorial Video</h3>
+                  <h3 className="text-lg font-semibold">Video</h3>
                   <div className="aspect-video rounded-lg overflow-hidden">
-                    <iframe
+                    <iframe 
                       src={automation.videoUrl}
                       className="w-full h-full"
+                      title="Tutorial video"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {automation.image && (
+              <>
+                <Separator />
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold">Blueprint</h3>
+                  <div className="relative rounded-lg overflow-hidden">
+                    <Image 
+                      src={automation.image[0].url} 
+                      alt="Automation image" 
+                      width={1200}
+                      height={800}
+                      className="w-full"
                     />
                   </div>
                 </div>
