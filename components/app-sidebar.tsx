@@ -21,11 +21,11 @@ import { cn } from "@/lib/utils"
 import { User } from "@supabase/supabase-js"
 import { createClient } from "@/libs/supabase/client"
 import { useState, useEffect } from "react"
+import Image from "next/image"
 
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
 import {
   Sidebar,
   SidebarContent,
@@ -57,23 +57,6 @@ export function AppSidebar() {
       avatar: user?.user_metadata?.avatar_url || "",
       initials: (user?.email?.[0] || "").toUpperCase()
     },
-    teams: [
-      {
-        name: "Acme Inc",
-        logo: GalleryVerticalEnd,
-        plan: "Enterprise",
-      },
-      {
-        name: "Acme Corp.",
-        logo: AudioWaveform,
-        plan: "Startup",
-      },
-      {
-        name: "Evil Corp.",
-        logo: Command,
-        plan: "Free",
-      },
-    ],
     navMain: [
       {
         title: "Dashboard",
@@ -147,8 +130,9 @@ export function AppSidebar() {
       },
       {
         name: "Documents",
-        url: "#",
+        url: "/dashboard/documents",
         icon: FileStack,
+        isActive: pathname === "/dashboard/documents" || pathname.startsWith("/dashboard/documents/") 
       },
     ],
   }
@@ -156,7 +140,15 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <div className="flex h-[52px] items-center justify-center px-4">
+          <Image
+            src="/logo.png"
+            width={150}
+            height={150}
+            alt="Logo"
+            className="dark:invert"
+          />
+        </div>
       </SidebarHeader>
       <SidebarContent>
         <nav className="grid gap-1">

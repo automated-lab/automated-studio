@@ -6,6 +6,11 @@ import ClientLayout from "@/components/LayoutClient";
 import { ThemeProvider } from "@/components/theme-provider";
 import config from "@/config";
 import "./globals.css";
+import { Toaster } from "react-hot-toast";
+import NextTopLoader from "nextjs-toploader";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react";
+import { Metadata } from "next";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -31,8 +36,18 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </head>
       )}
       <body>
-        {/* ClientLayout contains all the client wrappers (Crisp chat support, toast messages, tooltips, etc.) */}
-        <ClientLayout>{children}</ClientLayout>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <NextTopLoader />
+          <ClientLayout>{children}</ClientLayout>
+          <Toaster />
+          <SpeedInsights />
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   );

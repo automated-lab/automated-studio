@@ -1,3 +1,5 @@
+import Footer from "@/components/Footer";
+
 export default function Page() {
   return (
     <>
@@ -12,6 +14,7 @@ export default function Page() {
           className="btn btn-primary"
           href="https://shipfa.st/docs"
           target="_blank"
+          rel="noopener noreferrer"
         >
           Documentation & tutorials{" "}
           <svg

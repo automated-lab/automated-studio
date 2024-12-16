@@ -2,16 +2,17 @@
 
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import type { Automation } from "@/libs/airtable"
-import { Clock, Download, ExternalLink, PlayCircle, FileText } from "lucide-react"
+import type { Document } from "@/libs/airtable"
+import { Clock, Download, FileText } from "lucide-react"
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import React from 'react'
 
-interface AutomationContentProps {
-  automation: Automation | null
+interface DocumentContentProps {
+  document: Document | null
 }
 
-export function AutomationContent({ automation }: AutomationContentProps) {
+export function DocumentContent({ document }: DocumentContentProps) {
   const handleDownload = async (url: string, filename: string) => {
     try {
       const response = await fetch(url)
@@ -29,10 +30,12 @@ export function AutomationContent({ automation }: AutomationContentProps) {
     }
   }
 
-  if (!automation) {
+  if (!document) {
     return (
-      <div className="flex-1 p-8 flex items-center justify-center text-muted-foreground overflow-hidden">
-        Select an automation to view its details
+      <div className="flex-1 h-full">
+        <div className="h-full flex items-center justify-center text-muted-foreground">
+          Select a document to view its content
+        </div>
       </div>
     )
   }
@@ -42,53 +45,24 @@ export function AutomationContent({ automation }: AutomationContentProps) {
       <div className="h-full flex flex-col">
         <div className="flex items-center p-6 border-b shrink-0">
           <div className="flex-1">
-            <h2 className="text-lg font-semibold">{automation.name}</h2>
+            <h2 className="text-lg font-semibold">{document.name}</h2>
             <p className="text-sm text-muted-foreground">
-              {automation.shortDescription}
+              {document.shortDescription}
             </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" asChild>
-              <a 
-                href={automation.platform.startsWith('http') ? automation.platform : `https://${automation.platform}`} 
-                target="_blank" 
-                rel="noopener noreferrer"
-              >
-                <ExternalLink className="mr-2 h-4 w-4" />
-                {automation.platform.replace(/^https?:\/\//, '')}
-              </a>
-            </Button>
-            {automation.videoUrl && (
-              <Button variant="default" size="sm" asChild>
-                <a href={automation.videoUrl} target="_blank" rel="noopener noreferrer">
-                  <PlayCircle className="mr-2 h-4 w-4" />
-                  External Video
-                </a>
-              </Button>
-            )}
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto">
           <div className="p-6">
             <div className="space-y-6">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Clock className="h-4 w-4" />
-                <span>Time to implement: {automation.timeToImplement}</span>
-                {automation.category && (
-                  <>
-                    <span>•</span>
-                    <span>{automation.category}</span>
-                  </>
-                )}
-              </div>
+
 
               <div className="space-y-4">
                 <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-ul:text-foreground prose-li:text-foreground">
                   <ReactMarkdown 
                     remarkPlugins={[remarkGfm]}
                     components={{
-                      a: ({ href, children }) => (
+                      a: ({ href, children }: { href?: string; children: React.ReactNode }) => (
                         <a 
                           href={href} 
                           target="_blank" 
@@ -100,35 +74,18 @@ export function AutomationContent({ automation }: AutomationContentProps) {
                       ),
                     }}
                   >
-                    {automation.content}
+                    {document.content}
                   </ReactMarkdown>
                 </div>
               </div>
 
-              {automation.videoUrl && (
-                <>
-                  <Separator />
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Tutorial Video</h3>
-                    <div className="aspect-video rounded-lg overflow-hidden">
-                      <iframe
-                        src={automation.videoUrl}
-                        className="w-full h-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {automation.attachments && automation.attachments.length > 0 && (
+              {document.attachments && document.attachments.length > 0 && (
                 <>
                   <Separator />
                   <div>
                     <h2 className="text-lg font-semibold mb-4">Attachments</h2>
                     <div className="grid gap-4">
-                      {automation.attachments.map((attachment: any) => (
+                      {document.attachments.map((attachment: any) => (
                         <div
                           key={attachment.id}
                           className="flex items-center justify-between p-4 border rounded-lg"
