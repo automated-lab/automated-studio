@@ -33,18 +33,18 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string
-    email: string
-    avatar: string
-    initials: string
-  }
-}) {
+interface UserProps {
+  name: string;
+  email: string;
+  avatar: string;
+  initials: string;
+}
+
+export function NavUser({ user }: { user: UserProps | null }) {
   const { isMobile } = useSidebar()
   const { setTheme } = useTheme()
+  
+  if (!user) return null;  // Early return after hooks
 
   return (
     <SidebarMenu>

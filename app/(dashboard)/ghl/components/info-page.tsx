@@ -34,8 +34,8 @@ export default function InfoPage() {
   return (
     <div className="container mx-auto px-8 py-8">
       <header className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">Your GHL Dashboard</h1>
-        <p className="text-xl text-muted-foreground">Discover how we can revolutionize your workflow</p>
+        <h1 className="text-4xl font-bold mb-4">Your GHL (Neon CRM) Dashboard</h1>
+        <p className="text-xl text-muted-foreground">Scale your business with an industry leading CRM</p>
       </header>
 
       <main>
@@ -46,16 +46,43 @@ export default function InfoPage() {
           </CardHeader>
           <CardContent>
             <p className="mb-4">
-              Our app is designed to streamline your daily tasks, boost productivity, and make your life easier. 
-              With cutting-edge features and an intuitive interface, you'll wonder how you ever managed without it.
+            GoHighLevel is an all-in-one platform that centralizes marketing, sales, and business operations. It combines CRM, automation, website building, and client communication tools into a single dashboard, helping businesses streamline their workflows and grow more efficiently.
+            </p>
+            <p className="mb-4">
+              Here you can activate and track your agency&apos;s GHL activations including your own.
+            </p>
+            <p className="mb-4">
+              Get started by clicking &quot;Activate a GHL Subaccount&quot; below.
             </p>
             <div className="flex justify-center space-x-4">
-              <Button>
-                Get Started
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-              <Button variant="outline">
-                GHL Academy
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger asChild>
+                  <Button className="w-full sm:w-auto" onClick={() => setOpen(true)}>
+                    <Zap className="mr-2 h-4 w-4" /> Activate a GHL Subaccount
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px]">
+                  <DialogHeader>
+                    <DialogTitle>Activate GHL Subaccount</DialogTitle>
+                    <DialogDescription>
+                      Fill out this form to activate your GHL subaccount
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="h-[70vh]">
+                    <iframe
+                      src="https://forms.fillout.com/t/fpSjX2ydN8us"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        border: 'none',
+                        borderRadius: '10px',
+                      }}
+                    />
+                  </div>
+                </DialogContent>
+              </Dialog>
+              <Button variant="outline" className="w-full sm:w-auto">
+                <ExternalLink className="mr-2 h-4 w-4" href="https://app.neoncrm.io/"/> GHL Dashboard
               </Button>
             </div>
           </CardContent>
@@ -63,28 +90,36 @@ export default function InfoPage() {
 
         <Tabs defaultValue="features" className="mb-8">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="features">Key Features</TabsTrigger>
-            <TabsTrigger value="pricing">Suggested Pricing</TabsTrigger>
+            <TabsTrigger value="features">Key Selling Points</TabsTrigger>
+            <TabsTrigger value="pricing">Selling Strategy</TabsTrigger>
             <TabsTrigger value="faq">FAQ</TabsTrigger>
           </TabsList>
           <TabsContent value="features">
             <Card>
               <CardHeader>
                 <CardTitle>Key Features</CardTitle>
-                <CardDescription>What sets our app apart</CardDescription>
+                <CardDescription>How to position GHL to your clients</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex items-center space-x-2">
-                  <Badge variant="outline">New</Badge>
-                  <span>AI-powered task management</span>
+                  <Badge variant="success">Efficiency</Badge>
+                  <span>One platform replaces 8+ tools</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Badge variant="outline">Popular</Badge>
-                  <span>Real-time collaboration tools</span>
+                  <Badge variant="success">Efficiency</Badge>
+                  <span>Everything managed in single dashboard</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Badge variant="outline">Enhanced</Badge>
-                  <span>Advanced analytics dashboard</span>
+                  <Badge variant="success">Efficiency</Badge>
+                  <span>Automated follow-ups & reminders</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Badge variant="warning">Revenue</Badge>
+                  <span>Built-in ROI tracking</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Badge variant="success">Efficiency</Badge>
+                  <span>Unified inbox for all messages</span>
                 </div>
               </CardContent>
             </Card>
@@ -96,9 +131,9 @@ export default function InfoPage() {
                 <CardDescription>Choose the plan that fits your needs</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
-                <p>• Free Tier: Perfect for individuals</p>
-                <p>• Pro Tier: Ideal for small teams</p>
-                <p>• Enterprise: Customized for large organizations</p>
+                <p>• Free: Add to existing products/services</p>
+                <p>• One-time payment: Ideal for small teams</p>
+                <p>• Monthly subscription: Fully managed</p>
               </CardContent>
               <CardFooter>
                 <Button variant="outline">View Full Pricing</Button>
@@ -146,7 +181,7 @@ export default function InfoPage() {
         <Card className="mb-8">
           <CardHeader>
             <CardTitle>How It Works</CardTitle>
-            <CardDescription>Understanding our app's workflow</CardDescription>
+            <CardDescription>Understanding our app&apos;s workflow</CardDescription>
           </CardHeader>
           <CardContent>
             <Accordion type="single" collapsible className="w-full">
@@ -171,7 +206,7 @@ export default function InfoPage() {
               <AccordionItem value="step4">
                 <AccordionTrigger>4. Analyze and Improve</AccordionTrigger>
                 <AccordionContent>
-                  Leverage our advanced analytics to gain insights into your team's performance and continuously improve your processes.
+                  Leverage our advanced analytics to gain insights into your team&apos;s performance and continuously improve your processes.
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
@@ -183,7 +218,7 @@ export default function InfoPage() {
         <Card className="mb-8">
           <CardHeader>
             <CardTitle>Integrations</CardTitle>
-            <CardDescription>Seamlessly connect with your client's favorite tools</CardDescription>
+            <CardDescription>Seamlessly connect with your client&apos;s favorite tools</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -281,7 +316,7 @@ export default function InfoPage() {
                 </DialogContent>
               </Dialog>
               <Button variant="outline" className="w-full sm:w-auto">
-                <ExternalLink className="mr-2 h-4 w-4" /> GHL Dashboard
+                <ExternalLink className="mr-2 h-4 w-4" href="https://app.neoncrm.io/" /> GHL Dashboard
               </Button>
             </div>
           </CardContent>

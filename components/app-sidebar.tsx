@@ -25,23 +25,26 @@ import {
   DollarSign,
   Brain,
   Search,
+  Users,
 } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { User } from "@supabase/supabase-js"
 import { createClient } from "@/libs/supabase/client"
 import { useState, useEffect } from "react"
 import Image from "next/image"
-
-import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
-import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
 } from "@/components/ui/sidebar"
+import { NavMain } from "@/components/nav-main"
+import { NavProjects } from "@/components/nav-projects"
+import { NavUser } from "@/components/nav-user"
 
 const supabase = createClient()
 
@@ -60,90 +63,78 @@ export function AppSidebar() {
   }, [])
 
   const data = {
-    user: {
-      name: user?.user_metadata?.name || user?.email?.split("@")[0] || "",
-      email: user?.email || "",
-      avatar: user?.user_metadata?.avatar_url || "",
-      initials: (user?.email?.[0] || "").toUpperCase()
-    },
     navMain: [
-        {
-          title: "Dashboard",
-          url: "/dashboard",
-          icon: LayoutDashboard,
-          isActive: pathname === "/dashboard"
-        },
-        {
-          title: "Discounts",
-          url: "/discounts",
-          icon: DollarSign,
-          isActive: pathname.startsWith("/discounts")
-        }        
+      {
+        title: "Dashboard",
+        url: "/dashboard",
+        icon: LayoutDashboard,
+        isActive: pathname === "/dashboard"
+      },
+      {
+        title: "Clients",
+        url: "/clients",
+        icon: Users,
+        isActive: pathname.startsWith("/clients")
+      },
+      {
+        title: "Discounts",
+        url: "/discounts",
+        icon: DollarSign,
+        isActive: pathname.startsWith("/discounts")
+      }        
     ],
     applications: [
       {
         name: "GHL",
-        url: "/dashboard/ghl",
+        url: "/ghl",
         icon: SquareArrowUp,
-        isActive: pathname.startsWith("/dashboard/ghl")
+        isActive: pathname.startsWith("/ghl")
       },
       {
-        name: "Snappy Website Bots",
+        name: "Website Chatbots",
         url: "#",
         icon: Bot,
         isActive: false
       },
       {
-        name: "Snappy Social Bots",
+        name: "Social Media Bots",
         url: "#",
         icon: Bot,
         isActive: false
       },
       {
-        name: "Reviewr",
+        name: "Reputation Management",
         url: "#",
         icon: Star,
-        isActive: false
-      },
-      {
-        name: "Compressr",
-        url: "#",
-        icon: Link,
-        isActive: false
-      },
-      {
-        name: "Book Me",
-        url: "#",
-        icon: Calendar1,
         isActive: false
       }
     ],
     resources: [
       {
         name: "Automations",
-        url: "/dashboard/automations",
+        url: "/automations",
         icon: Bot,
-        isActive: pathname.startsWith("/dashboard/automations")
+        isActive: pathname.startsWith("/automations")
       },
       {
         name: "Code Snippets",
-        url: "/dashboard/snippets",
+        url: "/snippets",
         icon: Code,
-        isActive: pathname.startsWith("/dashboard/snippets")
+        isActive: pathname.startsWith("/snippets")
       },
       {
         name: "Documents",
-        url: "/dashboard/documents",
+        url: "/documents",
         icon: FileStack,
-        isActive: pathname.startsWith("/dashboard/documents")
+        isActive: pathname.startsWith("/documents")
       },
     ],
     tools: [
       {
         name: "Prospecting",
-        url: "/dashboard/prospecting",
+        url: "/prospecting",
         icon: Search,
-        isActive: pathname.startsWith("/dashboard/prospecting")
+        isActive: pathname.startsWith("/prospecting")
       },
       {
         name: "Proposal Generator",
@@ -152,7 +143,7 @@ export function AppSidebar() {
         isActive: pathname === "/dashboard/proposal-generator"
       },
       {
-        name: "Bot Prompting",
+        name: "Bot Prompt Generator",
         url: "/dashboard/bot-prompting",
         icon: Bot,
         isActive: pathname === "/dashboard/bot-prompting"
@@ -162,8 +153,40 @@ export function AppSidebar() {
         url: "/dashboard/bot-showcase",
         icon: Bot,
         isActive: pathname === "/dashboard/bot-showcase"
+      },
+      {
+        name: "Link Analytics",
+        url: "#",
+        icon: Link,
+        isActive: false
+      },
+      {
+        name: "Calendar Scheduling",
+        url: "#",
+        icon: Calendar1,
+        isActive: false
+      },
+      {
+        name: "AI Content",
+        url: "#",
+        icon: Brain,
+        isActive: false
+      },
+      {
+        name: "Social Media Scheduling",
+        url: "#",
+        icon: Calendar1,
+        isActive: false
       }
-    ]
+    ],
+    bottomNav: [
+      {
+        name: "AI Chat",
+        url: "/chat",
+        icon: Bot,
+        isActive: pathname.startsWith("/chat")
+      },      
+    ],
   }
 
   return (
@@ -182,13 +205,27 @@ export function AppSidebar() {
       <SidebarContent>
         <nav className="grid gap-1">
           <NavMain items={data.navMain} />
-          <NavProjects projects={data.applications} label="Applications" />
-          <NavProjects projects={data.resources} label="Resources" />
+          <NavProjects projects={data.applications} label="White-label Applications" />
           <NavProjects projects={data.tools} label="Tools" />
+          <NavProjects projects={data.resources} label="Resources" />
         </nav>
+        <div className="mt-auto pt-4">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <NavProjects projects={data.bottomNav} label="Copilot" />
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </div>
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user ? {
+          name: user.email?.split('@')[0] || 'User',
+          email: user.email || '',
+          avatar: '',
+          initials: (user.email?.[0] || 'U').toUpperCase()
+        } : null} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

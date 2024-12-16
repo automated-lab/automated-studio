@@ -9,12 +9,7 @@ import InfoPage from './components/info-page'
 
 export default function Page() {
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <InfoPage />
-      </SidebarInset>
-    </SidebarProvider>
+    <InfoPage />
   )
 }
 
