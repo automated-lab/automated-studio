@@ -181,7 +181,7 @@ export function AppSidebar() {
     ],
     bottomNav: [
       {
-        name: "AI Chat",
+        name: "AI Copilot",
         url: "/chat",
         icon: Bot,
         isActive: pathname.startsWith("/chat")

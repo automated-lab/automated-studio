@@ -11,6 +11,7 @@ import {
   Sun,
 } from "lucide-react"
 import { useTheme } from "next-themes"
+import Link from "next/link"
 
 import {
   Avatar,
@@ -90,16 +91,11 @@ export function NavUser({ user }: { user: UserProps | null }) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
+              <DropdownMenuItem asChild>
+                <Link href="/settings/profile">
+                  <BadgeCheck className="mr-2 h-4 w-4" />
+                  Profile
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <CreditCard />
