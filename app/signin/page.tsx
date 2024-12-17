@@ -27,13 +27,14 @@ export default function Login() {
 
     try {
       const { type, provider } = options;
-      const redirectURL = window.location.origin + "/api/auth/callback";
+      const redirectURL = `${window.location.origin}/api/auth/callback`;
 
       if (type === "magic_link") {
         const { data, error: otpError } = await supabase.auth.signInWithOtp({
           email,
           options: {
             emailRedirectTo: redirectURL,
+            shouldCreateUser: true,
           },
         });
 
