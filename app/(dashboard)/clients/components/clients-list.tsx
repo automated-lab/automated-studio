@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus, Phone, Mail, Globe } from 'lucide-react'
-import type { Client } from '@/types/database'
+import type { Client, ClientStatus } from '@/types/database'
 
 const formatBusinessType = (type: string) => {
   return type
@@ -62,8 +62,8 @@ export default function ClientsList() {
                     {client.company_name}
                   </CardTitle>
                   <div className={`px-2 py-1 rounded text-xs ${
-                    client.status === 'active' ? 'bg-green-100 text-green-800' :
-                    client.status === 'paused' ? 'bg-yellow-100 text-yellow-800' :
+                    client.status === ('active' as ClientStatus) ? 'bg-green-100 text-green-800' :
+                    client.status === ('paused' as ClientStatus) ? 'bg-yellow-100 text-yellow-800' :
                     'bg-red-100 text-red-800'
                   }`}>
                     {formatStatus(client.status)}
