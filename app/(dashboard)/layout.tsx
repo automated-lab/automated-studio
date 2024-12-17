@@ -5,6 +5,7 @@ import { cookies } from 'next/headers'
 import config from "@/config";
 import { AppSidebar } from "@/components/app-sidebar"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
+import { Toaster } from "@/components/ui/toaster"
 
 export default async function LayoutPrivate({
   children,
@@ -27,6 +28,7 @@ export default async function LayoutPrivate({
       <SidebarInset>
         {children}
       </SidebarInset>
+      <Toaster />
     </SidebarProvider>
   );
 } 

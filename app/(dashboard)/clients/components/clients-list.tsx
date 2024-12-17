@@ -4,8 +4,19 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus } from 'lucide-react'
+import { Plus, Phone, Mail, Globe } from 'lucide-react'
 import type { Client } from '@/types/database'
+
+const formatBusinessType = (type: string) => {
+  return type
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
+
+const formatStatus = (status: string) => {
+  return status.charAt(0).toUpperCase() + status.slice(1)
+}
 
 export default function ClientsList() {
   const [clients, setClients] = useState<Client[]>([])
@@ -55,16 +66,34 @@ export default function ClientsList() {
                     client.status === 'paused' ? 'bg-yellow-100 text-yellow-800' :
                     'bg-red-100 text-red-800'
                   }`}>
-                    {client.status}
+                    {formatStatus(client.status)}
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-muted-foreground mb-2">
                     {client.contact_name}
                   </div>
-                  <div className="text-sm text-muted-foreground">
-                    {client.business_type}
-                  </div>
+                  
+                  {client.contact_phone && (
+                    <div className="text-sm text-muted-foreground flex items-center gap-1 mb-1">
+                      <Phone className="h-3 w-3" />
+                      {client.contact_phone}
+                    </div>
+                  )}
+                  
+                  {client.contact_email && (
+                    <div className="text-sm text-muted-foreground flex items-center gap-1 mb-1">
+                      <Mail className="h-3 w-3" />
+                      {client.contact_email}
+                    </div>
+                  )}
+                  
+                  {client.website && (
+                    <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
+                      <Globe className="h-3 w-3" />
+                      {client.website.replace(/^https?:\/\//, '')}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </Link>

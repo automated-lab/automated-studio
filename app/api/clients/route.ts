@@ -32,21 +32,26 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const supabase = createRouteHandlerClient({ cookies })
-    const json = await request.json()
+    
+    // Get the authenticated user's ID
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
 
-    const { data: { session }, error: authError } = await supabase.auth.getSession()
-    if (authError || !session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const data = await request.json()
 
-    const clientData = {
-      ...json,
-      created_by: session.user.id
+    // Clean up date fields and add created_by
+    const cleanedData = {
+      ...data,
+      created_by: user.id,
+      next_review_date: data.next_review_date || null,
+      last_contact_date: data.last_contact_date || null,
+      ghl_activated_at: data.ghl_activated_at || null,
+      onboarding_completed_at: data.onboarding_completed_at || null
     }
 
     const { data: client, error } = await supabase
       .from('clients')
-      .insert([clientData])
+      .insert([cleanedData])
       .select()
       .single()
 
@@ -55,6 +60,6 @@ export async function POST(request: Request) {
     return NextResponse.json(client)
   } catch (error) {
     console.error('Error in POST:', error)
-    return NextResponse.json({ error: 'Failed to create client' }, { status: 500 })
+    return NextResponse.json({ error }, { status: 500 })
   }
 } 

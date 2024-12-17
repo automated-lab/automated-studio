@@ -1,41 +1,28 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { toast } from "react-hot-toast"
+import { useState, useEffect } from 'react'
+import { useRouter, useParams } from 'next/navigation'
 import { createClient } from '@/libs/supabase/client'
-
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
+import Link from 'next/link'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Building2, Contact, Globe, Settings, BarChart } from 'lucide-react'
+import { Textarea } from "@/components/ui/textarea"
+import { Building2, Contact, Globe, BarChart, Settings } from "lucide-react"
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+import type { Client } from '@/types/database'
 
 const formSchema = z.object({
   // Required fields
   company_name: z.string().min(2, "Company name must be at least 2 characters"),
-  business_type: z.enum(["Agency", "Local Business", "Enterprise", "Other"]),
-  status: z.enum(["Active", "Inactive", "Paused"]),
+  business_type: z.enum(["agency", "local_business", "enterprise", "other"]),
+  status: z.enum(["active", "inactive", "paused"]),
   
   // Optional fields with proper handling
   contact_name: z.string().min(2, "Contact name must be at least 2 characters").nullish().transform(val => val || ''),
@@ -65,47 +52,84 @@ const formSchema = z.object({
   billing_status: z.string().nullish().transform(val => val || '')
 })
 
-export default function CreateClientPage() {
+export default function EditClientPage() {
   const router = useRouter()
+  const params = useParams()
+  const [client, setClient] = useState<Client | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const supabase = createClient()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      business_type: "Agency",
-      status: "Active",
-      ghl_status: "none",
-      engagement_score: 0,
-      onboarding_completed: false,
-      reviewr_active: false,
-      website_bot_active: false,
-      social_bot_active: false,
-    },
+    defaultValues: {}
   })
+
+  useEffect(() => {
+    async function fetchClient() {
+      try {
+        const { data, error } = await supabase
+          .from('clients')
+          .select('*')
+          .eq('id', params.id)
+          .single()
+        
+        if (error) throw error
+
+        // Transform the data for the form
+        const formattedData = {
+          ...data,
+          business_type: data.business_type
+            .split('_')
+            .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' '),
+          status: data.status.charAt(0).toUpperCase() + data.status.slice(1)
+        }
+        
+        setClient(data)
+        form.reset(formattedData)
+      } catch (error) {
+        setError('Failed to load client')
+        console.error(error)
+      }
+    }
+    fetchClient()
+  }, [params.id, form])
+
+  if (error) return <div className="p-4">{error}</div>
+  if (!client) return <div className="p-4">Loading...</div>
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsLoading(true)
       
-      const response = await fetch('/api/clients', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to create client')
+      // Create a new object with formatted values
+      const formattedValues = {
+        ...values,
+        // Remove next_review_date if it's empty
+        next_review_date: values.next_review_date || null,
+        // Convert engagement_score to number if it exists
+        engagement_score: values.engagement_score ? Number(values.engagement_score) : null
       }
 
-      toast.success('Client created successfully')
-      router.push('/clients')
+      console.log('Submitting values:', formattedValues)
+      
+      const { error } = await supabase
+        .from('clients')
+        .update(formattedValues)
+        .eq('id', params.id)
+
+      if (error) {
+        console.error('Supabase error:', error)
+        throw error
+      }
+
+      toast.success('Client updated successfully')
+      router.push(`/clients/${params.id}`)
       router.refresh()
     } catch (error) {
-      toast.error('Failed to create client')
-      console.error(error)
+      toast.error('Failed to update client')
+      console.error('Update error:', error)
     } finally {
       setIsLoading(false)
     }
@@ -113,11 +137,17 @@ export default function CreateClientPage() {
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-6">Create New Client</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Editing {client.company_name}</h1>
+        <Link href={`/clients/${params.id}`}>
+          <Button variant="outline">Cancel</Button>
+        </Link>
+      </div>
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          {/* Basic Information */}
-          <Card>
+           {/* Basic Information */}
+           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Building2 className="h-5 w-5" />
@@ -155,10 +185,10 @@ export default function CreateClientPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="Agency">Agency</SelectItem>
-                          <SelectItem value="Local Business">Local Business</SelectItem>
-                          <SelectItem value="Enterprise">Enterprise</SelectItem>
-                          <SelectItem value="Other">Other</SelectItem>
+                          <SelectItem value="agency">Agency</SelectItem>
+                          <SelectItem value="local_business">Local Business</SelectItem>
+                          <SelectItem value="enterprise">Enterprise</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -405,11 +435,7 @@ export default function CreateClientPage() {
                   <FormItem>
                     <FormLabel>Next Review Date</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="date" 
-                        {...field}
-                        value={field.value || ''}
-                      />
+                      <Input type="date" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -422,14 +448,7 @@ export default function CreateClientPage() {
                   <FormItem>
                     <FormLabel>Engagement Score (0-100)</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        min="0" 
-                        max="100" 
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                        value={field.value}
-                      />
+                      <Input type="number" min="0" max="100" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -528,12 +547,12 @@ export default function CreateClientPage() {
           </Card>
 
           <div className="flex justify-end">
-            <Button type="submit" size="lg">
-              Create Client
+            <Button type="submit" size="lg" disabled={isLoading}>
+              {isLoading ? "Updating..." : "Update Client"}
             </Button>
           </div>
         </form>
       </Form>
     </div>
-  ) 
+  )
 }

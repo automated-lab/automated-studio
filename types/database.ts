@@ -1,6 +1,6 @@
-export type BusinessType = 'agency' | 'local_business' | 'enterprise' | 'other'
-export type ClientStatus = 'active' | 'inactive' | 'paused'
-export type GHLStatus = 'none' | 'pending' | 'active'
+export type BusinessType = 'RESTAURANT' | 'RETAIL' | 'SERVICE' | 'OTHER'
+export type ClientStatus = 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'CHURNED'
+export type GHLStatus = 'ACTIVE' | 'INACTIVE' | 'PENDING'
 
 // Represents a user in our system (from auth.users in Supabase)
 export interface User {
@@ -25,6 +25,16 @@ export interface User {
   stripe_customer_id?: string
 }
 
+export interface ClientDocument {
+  id: string
+  client_id: string
+  name: string
+  type: string
+  size: number
+  path: string
+  created_at: string
+}
+
 // Represents a client in our system
 export interface Client {
   id: string
@@ -34,35 +44,43 @@ export interface Client {
   company_name: string
   business_type: BusinessType
   status: ClientStatus
-  contact_name?: string
-  contact_email?: string
-  contact_phone?: string
-  website?: string
+  contact_name: string
+  contact_email: string
+  contact_phone: string
+  website: string
   
   // GHL fields
-  ghl_account_id?: string
-  ghl_location_id?: string
+  ghl_account_id: string
+  ghl_location_id: string
   ghl_status: GHLStatus
-  ghl_activated_at?: string
+  ghl_activated_at: string | null
   
   // Tracking fields
-  last_contact_date?: string
-  next_review_date?: string
+  last_contact_date: string | null
+  next_review_date: string | null
   engagement_score: number
-  products_activated: any[] // jsonb
-  products_available: any[] // jsonb
-  notes?: string
-  billing_status?: string
-  onboarding_completed_at?: string
-  last_success_metric?: Record<string, any> // jsonb
+  products_activated: {
+    [key: string]: any
+  }
+  products_available: {
+    [key: string]: any
+  }
+  notes: string
+  billing_status: string
+  onboarding_completed_at: string | null
+  last_success_metric: {
+    [key: string]: any
+  }
   
   // Bot and review fields
   reviewr_active: boolean
-  reviewr_link?: string
+  reviewr_link: string
   website_bot_active: boolean
-  website_bot_link?: string
+  website_bot_link: string
   social_bot_active: boolean
-  social_bot_link?: string
+  social_bot_link: string
+  onboarding_completed: boolean
+  documents?: ClientDocument[];
 }
 
 // Database schema type for Supabase
