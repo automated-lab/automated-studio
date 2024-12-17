@@ -137,7 +137,14 @@ export default function ProfilePage() {
   }, [supabase, form])
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return (
+      <div className="container mx-auto py-10 flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-2">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+          <p className="text-sm text-muted-foreground">Loading profile...</p>
+        </div>
+      </div>
+    )
   }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {

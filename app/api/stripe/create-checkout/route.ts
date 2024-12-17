@@ -1,23 +1,11 @@
-<<<<<<< HEAD
 import { NextResponse, NextRequest } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/libs/next-auth";
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
 import { createCheckout } from "@/libs/stripe";
-import connectMongo from "@/libs/mongoose";
-import User from "@/models/User";
 
 // This function is used to create a Stripe Checkout Session (one-time payment or subscription)
 // It's called by the <ButtonCheckout /> component
 // By default, it doesn't force users to be authenticated. But if they are, it will prefill the Checkout data with their email and/or credit card
-=======
-import { createCheckout } from "@/libs/stripe";
-import { createClient } from "@/libs/supabase/server";
-import { NextRequest, NextResponse } from "next/server";
-
-// This function is used to create a Stripe Checkout Session (one-time payment or subscription)
-// It's called by the <ButtonCheckout /> component
-// Users must be authenticated. It will prefill the Checkout data with their email and/or credit card (if any)
->>>>>>> supabase
 export async function POST(req: NextRequest) {
   const body = await req.json();
 
@@ -42,50 +30,36 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-<<<<<<< HEAD
-    const session = await getServerSession(authOptions);
-
-    await connectMongo();
-
-    const user = await User.findById(session?.user?.id);
-
-    const { priceId, mode, successUrl, cancelUrl } = body;
-=======
-    const supabase = createClient();
-
+    const supabase = createRouteHandlerClient({ cookies })
     const {
-      data: { user },
-    } = await supabase.auth.getUser();
+      data: { session },
+    } = await supabase.auth.getSession()
+
+    const userId = session?.user?.id
+
+    // If you need additional user data, fetch it from your Supabase table (e.g., 'profiles')
+    let user = null
+    if (userId) {
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+
+      user = userProfile
+    }
 
     const { priceId, mode, successUrl, cancelUrl } = body;
-
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user?.id)
-      .single();
->>>>>>> supabase
 
     const stripeSessionURL = await createCheckout({
       priceId,
       mode,
       successUrl,
       cancelUrl,
-      // If user is logged in, it will pass the user ID to the Stripe Session so it can be retrieved in the webhook later
-<<<<<<< HEAD
-      clientReferenceId: user?._id?.toString(),
-      // If user is logged in, this will automatically prefill Checkout data like email and/or credit card for faster checkout
+      // Pass the user ID if available
+      clientReferenceId: userId || undefined,
+      // Pass user data if needed
       user,
-=======
-      clientReferenceId: user?.id,
-      user: {
-        email: data?.email,
-        // If the user has already purchased, it will automatically prefill it's credit card
-        customerId: data?.customer_id,
-      },
->>>>>>> supabase
-      // If you send coupons from the frontend, you can pass it here
-      // couponId: body.couponId,
     });
 
     return NextResponse.json({ url: stripeSessionURL });

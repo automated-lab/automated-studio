@@ -1,27 +1,7 @@
 export * from "./config";
+export * from "./database";
 
-export type Profile = {
-  id: string
-  company_name: string | null
-  business_email: string | null
-  website: string | null
-  company_size: '1-10' | '11-50' | '51-200' | '201-500' | '500+' | null
-  industry_type: string | null
-  founded_year: number | null
-  primary_contact_name: string | null
-  phone: string | null
-  business_address: string | null
-  timezone: string | null
-  company_logo: string | null
-  social_media: {
-    linkedin?: string
-    twitter?: string
-  } | null
-  services_offered: string[] | null
-  primary_markets: string[] | null
-  company_description: string | null
-}
-
+// Onboarding specific types
 export type OnboardingData = {
   // Step 1: Basic Info
   company_name: string
@@ -50,3 +30,5 @@ export type OnboardingData = {
   tiktok_url?: string
   youtube_url?: string
 }
+
+// We can remove the Profile type since it's now covered by User in database.ts

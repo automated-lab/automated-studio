@@ -15,16 +15,8 @@ export async function POST(req: NextRequest) {
     // For instance, sending a welcome email (use the the sendEmail helper function from /libs/resend)
     // For instance, saving the lead in the database (uncomment the code below)
 
-<<<<<<< HEAD
-    // const lead = await Lead.findOne({ email: body.email });
-
-    // if (!lead) {
-    // 	await Lead.create({ email: body.email });
-    // }
-=======
     // const supabase = createClient();
     // await supabase.from("leads").insert({ email: body.email });
->>>>>>> supabase
 
     return NextResponse.json({});
   } catch (e) {

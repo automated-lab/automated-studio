@@ -11,6 +11,7 @@ import {
   Sun,
 } from "lucide-react"
 import { useTheme } from "next-themes"
+import { createClient } from '@/libs/supabase/client'
 import Link from "next/link"
 
 import {
@@ -122,9 +123,15 @@ export function NavUser({ user }: { user: UserProps | null }) {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOut />
-              Log out
+            <DropdownMenuItem 
+              onClick={async () => {
+                const supabase = createClient()
+                await supabase.auth.signOut()
+                window.location.href = '/'
+              }}
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

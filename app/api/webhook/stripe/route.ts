@@ -89,13 +89,6 @@ export async function POST(req: NextRequest) {
           user = profile;
         }
 
-<<<<<<< HEAD
-        // Update user data + Grant user access to your product. It's a boolean in the database, but could be a number of credits, etc...
-        user.priceId = priceId;
-        user.customerId = customerId;
-        user.hasAccess = true;
-        await user.save();
-=======
         await supabase
           .from("profiles")
           .update({
@@ -104,7 +97,6 @@ export async function POST(req: NextRequest) {
             has_access: true,
           })
           .eq("id", user?.id);
->>>>>>> supabase
 
         // Extra: send email with user link, product page, etc...
         // try {
@@ -134,18 +126,6 @@ export async function POST(req: NextRequest) {
         // ❌ Revoke access to the product
         const stripeObject: Stripe.Subscription = event.data
           .object as Stripe.Subscription;
-<<<<<<< HEAD
-
-        const subscription = await stripe.subscriptions.retrieve(
-          stripeObject.id
-        );
-        const user = await User.findOne({ customerId: subscription.customer });
-
-        // Revoke access to your product
-        user.hasAccess = false;
-        await user.save();
-
-=======
         const subscription = await stripe.subscriptions.retrieve(
           stripeObject.id
         );
@@ -154,30 +134,12 @@ export async function POST(req: NextRequest) {
           .from("profiles")
           .update({ has_access: false })
           .eq("customer_id", subscription.customer);
->>>>>>> supabase
         break;
       }
 
       case "invoice.paid": {
         // Customer just paid an invoice (for instance, a recurring payment for a subscription)
         // ✅ Grant access to the product
-<<<<<<< HEAD
-
-        const stripeObject: Stripe.Invoice = event.data
-          .object as Stripe.Invoice;
-
-        const priceId = stripeObject.lines.data[0].price.id;
-        const customerId = stripeObject.customer;
-
-        const user = await User.findOne({ customerId });
-
-        // Make sure the invoice is for the same plan (priceId) the user subscribed to
-        if (user.priceId !== priceId) break;
-
-        // Grant user access to your product. It's a boolean in the database, but could be a number of credits, etc...
-        user.hasAccess = true;
-        await user.save();
-=======
         const stripeObject: Stripe.Invoice = event.data
           .object as Stripe.Invoice;
         const priceId = stripeObject.lines.data[0].price.id;
@@ -198,7 +160,6 @@ export async function POST(req: NextRequest) {
           .from("profiles")
           .update({ has_access: true })
           .eq("customer_id", customerId);
->>>>>>> supabase
 
         break;
       }

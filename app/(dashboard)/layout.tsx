@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { redirect } from "next/navigation";
-import { createClient } from "@/libs/supabase/server";
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
 import config from "@/config";
 import { AppSidebar } from "@/components/app-sidebar"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
@@ -10,7 +11,7 @@ export default async function LayoutPrivate({
 }: {
   children: ReactNode;
 }) {
-  const supabase = createClient();
+  const supabase = createServerComponentClient({ cookies })
 
   const {
     data: { session },
