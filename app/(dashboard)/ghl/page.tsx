@@ -5,7 +5,7 @@ import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar"
-import InfoPage from './components/info-page'
+import InfoPage from '../../components/ghl/info-page'
 
 export default function Page() {
   return (
