@@ -184,7 +184,7 @@ export function DocumentsTab({ client }: DocumentsTabProps) {
   }
 
   return (
-    <Card>
+    <Card className="mt-6">
       <CardHeader>
         <CardTitle>Client Documents</CardTitle>
         <CardDescription>Access and manage client-related documents</CardDescription>

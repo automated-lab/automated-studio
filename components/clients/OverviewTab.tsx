@@ -64,7 +64,7 @@ export function OverviewTab({ client, clientProducts }: OverviewTabProps) {
 
   return (
     <div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mt-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -193,7 +193,7 @@ export function OverviewTab({ client, clientProducts }: OverviewTabProps) {
                       <Badge 
                         key={index} 
                         variant="secondary"
-                        className="bg-green-100 text-green-700 hover:bg-green-200"
+                        className="bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/40"
                       >
                         {cp.product.name}
                       </Badge>
@@ -209,7 +209,7 @@ export function OverviewTab({ client, clientProducts }: OverviewTabProps) {
                       <Badge 
                         key={index} 
                         variant="outline"
-                        className="text-gray-500"
+                        className="text-gray-500 dark:text-gray-400"
                       >
                         {cp.product.name}
                       </Badge>

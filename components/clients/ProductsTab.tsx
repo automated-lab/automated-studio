@@ -148,14 +148,16 @@ export function ProductsTab({ clientId, clientProducts, onUpdate }: ProductsTabP
     return (
       <Card 
         className={`cursor-pointer transition-all hover:shadow-lg ${
-          is_active ? 'border-green-200 bg-green-50' : 'hover:border-blue-200'
+          is_active 
+            ? 'border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20' 
+            : 'hover:border-blue-200 dark:hover:border-blue-800'
         }`}
       >
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <div className={`p-2 rounded-full ${
-                is_active ? 'bg-green-500' : 'bg-gray-200'
+                is_active ? 'bg-green-500' : 'bg-gray-200 dark:bg-gray-700'
               }`}>
                 <div className="text-white">
                   {PRODUCT_ICONS[product.name] || PRODUCT_ICONS.default}
@@ -209,7 +211,7 @@ export function ProductsTab({ clientId, clientProducts, onUpdate }: ProductsTabP
               </Button>
             )}
           </div>
-          <CardDescription>{product.description}</CardDescription>
+          <CardDescription className="dark:text-gray-400">{product.description}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex justify-between items-center">
@@ -217,13 +219,13 @@ export function ProductsTab({ clientId, clientProducts, onUpdate }: ProductsTabP
               <p className="text-sm font-medium">Features:</p>
               <div className="flex flex-wrap gap-2">
                 {product.features.map((feature, i) => (
-                  <Badge key={i} variant="secondary">{feature}</Badge>
+                  <Badge key={i} variant="secondary" className="dark:bg-gray-800">{feature}</Badge>
                 ))}
               </div>
             </div>
             <p className="text-lg font-bold text-muted-foreground">
               {is_active ? (
-                `Subscribed at:  $${clientPrice}/mo`
+                `Subscribed at: $${clientPrice}/mo`
               ) : (
                 `Suggested: $${product.suggested_price}/mo`
               )}
@@ -236,7 +238,7 @@ export function ProductsTab({ clientId, clientProducts, onUpdate }: ProductsTabP
 
   return (
     <>
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 mt-6">
         {clientProducts.map((clientProduct) => (
           <ProductCard 
             key={clientProduct.product_id} 

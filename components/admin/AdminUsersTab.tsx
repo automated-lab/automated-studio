@@ -35,12 +35,7 @@ export function UsersTab({ initialUsers }: { initialUsers: User[] }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between">
-        <h2 className="text-2xl font-bold">Users</h2>
-        <NewUserDialog onSuccess={refreshUsers} />
-      </div>
-
-      <Card>
+      <Card className="mt-6 mb-8">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
@@ -48,7 +43,6 @@ export function UsersTab({ initialUsers }: { initialUsers: User[] }) {
                 <TableHead>Name</TableHead>
                 <TableHead>Auth Email</TableHead>
                 <TableHead>Company</TableHead>
-                
                 <TableHead>Status</TableHead>
                 <TableHead>Admin</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -79,6 +73,10 @@ export function UsersTab({ initialUsers }: { initialUsers: User[] }) {
           </Table>
         </CardContent>
       </Card>
+
+      <div className="flex justify-end">
+        <NewUserDialog onSuccess={refreshUsers} />
+      </div>
     </div>
   )
 }
