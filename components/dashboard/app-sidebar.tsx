@@ -50,13 +50,22 @@ const supabase = createClient()
 
 export function AppSidebar() {
   const pathname = usePathname()
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<User & { is_admin?: boolean }>(null)
 
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
-        setUser(user)
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single()
+        
+        setUser({
+          ...user,
+          is_admin: profile?.is_admin || false
+        })
       }
     }
     getUser()
@@ -224,7 +233,8 @@ export function AppSidebar() {
           name: user.email?.split('@')[0] || 'User',
           email: user.email || '',
           avatar: '',
-          initials: (user.email?.[0] || 'U').toUpperCase()
+          initials: (user.email?.[0] || 'U').toUpperCase(),
+          is_admin: user.is_admin
         } : null} />
       </SidebarFooter>
       <SidebarRail />

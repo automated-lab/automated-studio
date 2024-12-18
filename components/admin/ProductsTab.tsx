@@ -11,8 +11,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { NewProductDialog } from './new-product-dialog'
+import { Progress } from "@/components/ui/progress"
 
 interface ProductsTabProps {
   initialProducts: Product[]
@@ -73,6 +74,33 @@ export function ProductsTab({ initialProducts }: ProductsTabProps) {
               ))}
             </TableBody>
           </Table>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Revenue Opportunity</CardTitle>
+          <CardDescription>
+            Potential additional monthly revenue from inactive products
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-3xl font-bold text-green-600">
+            ${products
+              .filter(p => !p.is_active)
+              .reduce((sum, p) => sum + p.suggested_price, 0)
+              }/mo
+          </div>
+          <Progress 
+            value={
+              (products.filter(p => p.is_active).length / 
+              products.length) * 100
+            } 
+            className="mt-2" 
+          />
+          <p className="text-sm text-muted-foreground mt-2">
+            {products.filter(p => p.is_active).length} of {products.length} products activated
+          </p>
         </CardContent>
       </Card>
     </div>

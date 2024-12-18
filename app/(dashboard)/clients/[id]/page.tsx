@@ -3,20 +3,31 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '@/libs/supabase/client'
-import type { Client } from '@/types/database'
+import type { Client, ClientProduct } from '@/types/database'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { OverviewTab } from '../../../../components/clients/OverviewTab'
-import { FeaturesTab } from '../../../../components/clients/FeaturesTab'
 import { DocumentsTab } from '../../../../components/clients/DocumentsTab'
 import { Button } from "@/components/ui/button"
 import { Pencil, ChevronLeft, Loader2 } from "lucide-react"
 import Link from 'next/link'
+import { ProductsTab } from '@/components/clients/ProductsTab'
+import { Product } from '@/types/database'
 
-export default function ClientDashboard() {
+export default function ClientPage() {
   const params = useParams()
   const [client, setClient] = useState<Client | null>(null)
   const [error, setError] = useState<string | null>(null)
   const supabase = createClient()
+  const [clientProducts, setClientProducts] = useState<ClientProduct[]>([])
+  const [activeTab, setActiveTab] = useState('overview')
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const tab = params.get('tab')
+    if (tab) {
+      setActiveTab(tab)
+    }
+  }, [])
 
   useEffect(() => {
     async function fetchClient() {
@@ -35,6 +46,20 @@ export default function ClientDashboard() {
       }
     }
     fetchClient()
+  }, [params.id])
+
+  useEffect(() => {
+    const fetchClientProducts = async () => {
+      console.log('Fetching client products for:', params.id)
+      const res = await fetch(`/api/client-products?clientId=${params.id}`)
+      const data = await res.json()
+      console.log('Received client products:', data)
+      setClientProducts(data)
+    }
+    
+    if (params.id) {
+      fetchClientProducts()
+    }
   }, [params.id])
 
   if (error) return <div className="p-4">{error}</div>
@@ -64,10 +89,10 @@ export default function ClientDashboard() {
         </div>
       </div>
       
-      <Tabs defaultValue="overview" className="space-y-4">
+      <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="features">Features</TabsTrigger>
+          <TabsTrigger value="products">Products and Services</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
         </TabsList>
 
@@ -75,8 +100,8 @@ export default function ClientDashboard() {
           <OverviewTab client={client} />
         </TabsContent>
         
-        <TabsContent value="features">
-          <FeaturesTab client={client} />
+        <TabsContent value="products">
+          <ProductsTab clientId={client.id} clientProducts={clientProducts} />
         </TabsContent>
         
         <TabsContent value="documents">

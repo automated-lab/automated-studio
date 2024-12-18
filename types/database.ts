@@ -105,11 +105,25 @@ export interface Database {
 export interface Product {
   id: string
   name: string
-  description: string | null
-  price: number
-  suggested_price: number
+  description: string
+  type: string
   features: string[]
+  suggested_price: number
+  platform_url: string
+  price: number
   is_active: boolean
   created_at: string
   updated_at: string
+  fillout_form_id?: string
+} 
+
+export interface ClientProduct {
+  id: string
+  client_id: string
+  product_id: string
+  is_active: boolean
+  price: number | null
+  created_at: string
+  updated_at: string
+  product?: Product // For joined queries
 } 

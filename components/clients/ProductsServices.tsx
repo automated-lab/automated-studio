@@ -5,7 +5,7 @@ interface FeaturesTabProps {
   client: Client
 }
 
-export function FeaturesTab({ client }: FeaturesTabProps) {
+export function ProductsServicesTab({ client }: FeaturesTabProps) {
   return (
     <Card>
       <CardHeader>

@@ -29,6 +29,7 @@ const productSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
   suggested_price: z.coerce.number().min(0, "Suggested price must be positive"),
+  platform_url: z.string().url("Must be a valid URL"),
   features: z.string().transform(str => str.split(',').map(s => s.trim()).filter(Boolean)),
   is_active: z.boolean().default(true)
 })
@@ -37,6 +38,7 @@ type ProductFormValues = {
   name: string
   description: string
   suggested_price: number
+  platform_url: string
   features: string
   is_active: boolean
 }
@@ -55,6 +57,7 @@ export function NewProductDialog({ onSuccess }: NewProductDialogProps) {
       name: "",
       description: "",
       suggested_price: 0,
+      platform_url: "",
       features: "",
       is_active: true,
     },
@@ -139,6 +142,19 @@ export function NewProductDialog({ onSuccess }: NewProductDialogProps) {
                 )}
               />
             </div>
+            <FormField
+              control={form.control}
+              name="platform_url"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Platform URL</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="https://example.com/dashboard" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="features"

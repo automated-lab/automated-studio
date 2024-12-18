@@ -9,6 +9,7 @@ import {
   Moon,
   Sparkles,
   Sun,
+  Shield,
 } from "lucide-react"
 import { useTheme } from "next-themes"
 import { createClient } from '@/libs/supabase/client'
@@ -40,6 +41,7 @@ interface UserProps {
   email: string;
   avatar: string;
   initials: string;
+  is_admin?: boolean;
 }
 
 export function NavUser({ user }: { user: UserProps | null }) {
@@ -108,6 +110,19 @@ export function NavUser({ user }: { user: UserProps | null }) {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
+            {user.is_admin && (
+              <>
+                <DropdownMenuGroup>
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin">
+                      <Shield className="mr-2 h-4 w-4" />
+                      Admin Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+              </>
+            )}
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={() => setTheme("light")}>
                 <Sun className="size-4" />

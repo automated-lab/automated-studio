@@ -34,8 +34,8 @@ import { Building2, Contact, Globe, Settings, BarChart } from 'lucide-react'
 const formSchema = z.object({
   // Required fields
   company_name: z.string().min(2, "Company name must be at least 2 characters"),
-  business_type: z.enum(["Agency", "Local Business", "Enterprise", "Other"]),
-  status: z.enum(["Active", "Inactive", "Paused"]),
+  business_type: z.enum(["agency", "local_business", "enterprise", "other"]),
+  status: z.enum(["active", "inactive", "paused"]),
   
   // Optional fields with proper handling
   contact_name: z.string().min(2, "Contact name must be at least 2 characters").nullish().transform(val => val || ''),
@@ -53,7 +53,7 @@ const formSchema = z.object({
   onboarding_completed: z.boolean().default(false),
   
   // Optional fields that can be null
-  next_review_date: z.string().nullish().transform(val => val || ''),
+  next_review_date: z.string().nullish().transform(val => val || null),
   engagement_score: z.coerce.number().min(0).max(100).nullish().transform(val => val || null),
   products_activated: z.string().or(z.array(z.string())).transform(val => 
     Array.isArray(val) ? val.join(', ') : val
@@ -73,8 +73,8 @@ export default function CreateClientPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      business_type: "Agency",
-      status: "Active",
+      business_type: "agency",
+      status: "active",
       ghl_status: "none",
       engagement_score: 0,
       onboarding_completed: false,
@@ -148,19 +148,19 @@ export default function CreateClientPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Business Type</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
+                      <FormControl>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select business type" />
                           </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Agency">Agency</SelectItem>
-                          <SelectItem value="Local Business">Local Business</SelectItem>
-                          <SelectItem value="Enterprise">Enterprise</SelectItem>
-                          <SelectItem value="Other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
+                          <SelectContent>
+                            <SelectItem value="agency">Agency</SelectItem>
+                            <SelectItem value="local_business">Local Business</SelectItem>
+                            <SelectItem value="enterprise">Enterprise</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
