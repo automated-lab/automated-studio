@@ -1,8 +1,8 @@
 "use client"
 
 import { SidebarInset } from "@/components/ui/sidebar"
-import { AutomationList } from "../../components/automations/automation-list"
-import { AutomationContent } from "../../components/automations/automation-content"
+import { AutomationList } from "../../../components/automations/automation-list"
+import { AutomationContent } from "../../../components/automations/automation-content"
 import { useState } from "react"
 import type { Automation } from "@/libs/airtable"
 import { ChevronLeft } from "lucide-react"

@@ -23,6 +23,7 @@ export interface User {
   company_description: string | null
   subscription_status?: string
   stripe_customer_id?: string
+  is_admin?: boolean
 }
 
 export interface ClientDocument {
@@ -99,4 +100,16 @@ export interface Database {
       }
     }
   }
+} 
+
+export interface Product {
+  id: string
+  name: string
+  description: string | null
+  price: number
+  suggested_price: number
+  features: string[]
+  is_active: boolean
+  created_at: string
+  updated_at: string
 } 

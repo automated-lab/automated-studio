@@ -1,8 +1,8 @@
 "use client"
 
 import { SidebarInset } from "@/components/ui/sidebar"
-import { DocumentList } from "../../components/documents/document-list"
-import { DocumentContent } from "../../components/documents/document-content"
+import { DocumentList } from "../../../components/documents/document-list"
+import { DocumentContent } from "../../../components/documents/document-content"
 import { useState } from "react"
 import type { Document } from "@/libs/airtable"
 import { ChevronLeft } from "lucide-react"

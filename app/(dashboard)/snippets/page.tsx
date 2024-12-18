@@ -1,8 +1,8 @@
 "use client"
 
 import { SidebarInset } from "@/components/ui/sidebar"
-import { SnippetList } from "./components/snippet-list"
-import { SnippetContent } from "./components/snippet-content"
+import { SnippetList } from "../../../components/snippets/snippet-list"
+import { SnippetContent } from "../../../components/snippets/snippet-content"
 import { useState } from "react"
 import type { Snippet } from "@/libs/airtable"
 import { Button } from "@/components/ui/button"

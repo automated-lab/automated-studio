@@ -42,9 +42,9 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar"
-import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
-import { NavUser } from "@/components/nav-user"
+import { NavMain } from "@/components/shipfast/nav-main"
+import { NavProjects } from "@/components/shipfast/nav-projects"
+import { NavUser } from "@/components/shipfast/nav-user"
 
 const supabase = createClient()
 

@@ -1,4 +1,4 @@
-import Footer from "@/components/Footer";
+import Footer from "@/components/shipfast/Footer";
 
 export default function Page() {
   return (

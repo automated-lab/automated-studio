@@ -2,15 +2,15 @@ import { ReactNode } from "react";
 import { Inter } from "next/font/google";
 import { Viewport } from "next";
 import { getSEOTags } from "@/libs/seo";
-import ClientLayout from "@/components/LayoutClient";
-import { ThemeProvider } from "@/components/theme-provider";
+import ClientLayout from "@/components/shipfast/LayoutClient";
+import { ThemeProvider } from "@/components/shipfast/theme-provider";
 import config from "@/config";
 import "./globals.css";
-import { Toaster } from "react-hot-toast";
 import NextTopLoader from "nextjs-toploader";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import { Metadata } from "next";
+import { Toaster } from "sonner"
 
 const font = Inter({ subsets: ["latin"] });
 

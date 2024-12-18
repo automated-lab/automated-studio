@@ -5,9 +5,9 @@ import { useParams } from 'next/navigation'
 import { createClient } from '@/libs/supabase/client'
 import type { Client } from '@/types/database'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { OverviewTab } from '../../../components/clients/OverviewTab'
-import { FeaturesTab } from '../../../components/clients/FeaturesTab'
-import { DocumentsTab } from '../../../components/clients/DocumentsTab'
+import { OverviewTab } from '../../../../components/clients/OverviewTab'
+import { FeaturesTab } from '../../../../components/clients/FeaturesTab'
+import { DocumentsTab } from '../../../../components/clients/DocumentsTab'
 import { Button } from "@/components/ui/button"
 import { Pencil, ChevronLeft, Loader2 } from "lucide-react"
 import Link from 'next/link'
