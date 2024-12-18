@@ -17,6 +17,8 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import type { Client } from '@/types/database'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import { Trash2 } from "lucide-react"
 
 const formSchema = z.object({
   // Required fields
@@ -130,6 +132,31 @@ export default function EditClientPage() {
     } catch (error) {
       toast.error('Failed to update client')
       console.error('Update error:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    try {
+      setIsLoading(true)
+      console.log('Sending delete request for client:', params.id)
+      
+      const res = await fetch(`/api/clients?id=${params.id}`, {
+        method: 'DELETE',
+      })
+      
+      const data = await res.json()
+      console.log('Delete response:', data)
+      
+      if (!res.ok) throw new Error(data.error || 'Failed to delete client')
+      
+      toast.success('Client deleted successfully')
+      router.push('/clients')
+      router.refresh()
+    } catch (error) {
+      console.error('Delete error:', error)
+      toast.error('Failed to delete client')
     } finally {
       setIsLoading(false)
     }
@@ -546,7 +573,34 @@ export default function EditClientPage() {
             </CardContent>
           </Card>
 
-          <div className="flex justify-end">
+          <div className="flex justify-between items-center">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button type="button" variant="destructive">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete Client
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete the client
+                    and all associated data.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction 
+                    onClick={handleDelete}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            
             <Button type="submit" size="lg" disabled={isLoading}>
               {isLoading ? "Updating..." : "Update Client"}
             </Button>

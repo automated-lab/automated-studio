@@ -110,7 +110,7 @@ export default function ClientPage() {
         </TabsList>
 
         <TabsContent value="overview">
-          <OverviewTab client={client} />
+          <OverviewTab client={client} clientProducts={clientProducts} />
         </TabsContent>
         
         <TabsContent value="products">

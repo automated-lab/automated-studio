@@ -78,4 +78,53 @@ export async function POST(req: Request) {
     console.error('Error creating client:', error)
     return NextResponse.json({ error: error.message }, { status: 400 })
   }
+}
+
+export async function DELETE(req: Request) {
+  const { searchParams } = new URL(req.url)
+  const id = searchParams.get('id')
+  
+  console.log('Attempting to delete client:', id)
+  
+  try {
+    // Use route handler client for auth check
+    const routeHandler = createRouteHandlerClient({ cookies })
+    const { data: { session }, error: authError } = await routeHandler.auth.getSession()
+    
+    if (authError || !session) {
+      console.log('Auth error:', authError)
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Use service role client for deletion
+    console.log('Deleting client_products...')
+    const { error: productsError } = await supabase  // Using the service role client
+      .from('client_products')
+      .delete()
+      .eq('client_id', id)
+
+    if (productsError) {
+      console.error('Error deleting client_products:', productsError)
+      throw productsError
+    }
+
+    console.log('Deleting client...')
+    const { data, error } = await supabase  // Using the service role client
+      .from('clients')
+      .delete()
+      .eq('id', id)
+      .eq('created_by', session.user.id)
+      .select()
+
+    if (error) {
+      console.error('Error deleting client:', error)
+      throw error
+    }
+    
+    console.log('Delete result:', data)
+    return NextResponse.json({ success: true })
+  } catch (error: any) {
+    console.error('Delete error:', error)
+    return NextResponse.json({ error: error.message }, { status: 400 })
+  }
 } 
