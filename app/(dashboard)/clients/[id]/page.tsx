@@ -62,6 +62,19 @@ export default function ClientPage() {
     }
   }, [params.id])
 
+  const handleTabChange = (value: string) => {
+    setActiveTab(value)
+    // Update URL without refresh
+    const newUrl = `${window.location.pathname}${value === 'overview' ? '' : `?tab=${value}`}`
+    window.history.pushState({}, '', newUrl)
+  }
+
+  const refreshClientProducts = async () => {
+    const res = await fetch(`/api/client-products?clientId=${params.id}`)
+    const data = await res.json()
+    setClientProducts(data)
+  }
+
   if (error) return <div className="p-4">{error}</div>
   if (!client) return (
     <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
@@ -89,7 +102,7 @@ export default function ClientPage() {
         </div>
       </div>
       
-      <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab}>
+      <Tabs defaultValue={activeTab} value={activeTab} onValueChange={handleTabChange}>
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="products">Products and Services</TabsTrigger>
@@ -101,7 +114,11 @@ export default function ClientPage() {
         </TabsContent>
         
         <TabsContent value="products">
-          <ProductsTab clientId={client.id} clientProducts={clientProducts} />
+          <ProductsTab 
+            clientId={client.id} 
+            clientProducts={clientProducts} 
+            onUpdate={refreshClientProducts}
+          />
         </TabsContent>
         
         <TabsContent value="documents">
