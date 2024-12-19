@@ -40,7 +40,7 @@ export function LoginForm() {
       const { error } = await supabase.auth.signInWithOtp({
         email: values.email,
         options: {
-          emailRedirectTo: `${window.location.origin}/api/auth/callback?invite_code=${values.inviteCode.trim()}`,
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/callback?invite_code=${values.inviteCode.trim()}`,
         }
       })
 
