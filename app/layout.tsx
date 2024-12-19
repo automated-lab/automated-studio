@@ -46,7 +46,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           enableSystem
           disableTransitionOnChange
         >
-          <NextTopLoader />
+          <NextTopLoader 
+            color="#287150"
+            height={2}
+            showSpinner={false}
+          />
           <ClientLayout>{children}</ClientLayout>
           <Toaster />
           <SpeedInsights />
