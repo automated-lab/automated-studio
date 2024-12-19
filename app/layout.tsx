@@ -11,6 +11,9 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import { Metadata } from "next";
 import { Toaster } from "sonner"
+import { CopilotKit } from "@copilotkit/react-core";
+import "@copilotkit/react-ui/styles.css";
+
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -36,6 +39,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </head>
       )}
       <body>
+      <CopilotKit publicApiKey={process.env.COPILOT_KIT_PUBLIC_KEY}> 
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -48,6 +52,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <SpeedInsights />
           <Analytics />
         </ThemeProvider>
+        </CopilotKit>
       </body>
     </html>
   );

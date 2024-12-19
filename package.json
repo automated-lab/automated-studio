@@ -10,6 +10,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@copilotkit/react-core": "^1.4.7",
+    "@copilotkit/react-ui": "^1.4.7",
     "@headlessui/react": "^1.7.18",
     "@hookform/resolvers": "^3.9.1",
     "@mdx-js/loader": "^2.3.0",

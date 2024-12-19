@@ -1,11 +1,10 @@
-import { ReactNode } from "react";
-import { redirect } from "next/navigation";
+import { headers } from 'next/headers'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
-import config from "@/config";
-import { AppSidebar } from "@/components/dashboard/app-sidebar"
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
-import { Toaster } from "@/components/ui/toaster"
+import DashboardLayoutClient from './layout.client'
+import { redirect } from 'next/navigation';
+import { ReactNode } from 'react';
+import config from '@/config'
 
 export default async function LayoutPrivate({
   children,
@@ -13,22 +12,11 @@ export default async function LayoutPrivate({
   children: ReactNode;
 }) {
   const supabase = createServerComponentClient({ cookies })
+  const { data: { user }, error } = await supabase.auth.getUser()
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session) {
-    redirect(config.auth.loginUrl);
+  if (error || !user) {
+    redirect(config.auth.loginUrl)
   }
 
-  return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        {children}
-      </SidebarInset>
-      <Toaster />
-    </SidebarProvider>
-  );
+  return <DashboardLayoutClient user={user}>{children}</DashboardLayoutClient>
 } 

@@ -213,12 +213,12 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <nav className="grid gap-1">
-          <NavMain items={data.navMain} />
-          <NavProjects projects={data.applications} label="White-label Applications" />
+          <NavMain items={data.navMain} />          
           <NavProjects projects={data.tools} label="Tools" />
+          <NavProjects projects={data.applications} label="White-label Applications" />
           <NavProjects projects={data.resources} label="Resources" />
         </nav>
-        <div className="mt-auto pt-4">
+        {/* <div className="mt-auto pt-4">
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
@@ -226,7 +226,7 @@ export function AppSidebar() {
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
-        </div>
+        </div> */}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user ? {
