@@ -3,9 +3,17 @@ import {
     AvatarFallback,
     AvatarImage,
   } from "@/components/ui/avatar"
+import { Card, CardDescription, CardTitle } from "@/components/ui/card"
+import { CardContent, CardHeader } from "@/components/ui/card"
   
   export function RecentSales() {
     return (
+      <Card className="col-span-3">
+        <CardHeader>
+          <CardTitle> Recent Sales</CardTitle>
+          <CardDescription>You made 265 sales this month.</CardDescription>
+        </CardHeader>
+        <CardContent>
       <div className="space-y-8">
         <div className="flex items-center">
           <Avatar className="h-9 w-9">
@@ -67,5 +75,7 @@ import {
           <div className="ml-auto font-medium">+$39.00</div>
         </div>
       </div>
+      </CardContent>
+    </Card>
     )
   }

@@ -1,12 +1,12 @@
 import { headers } from 'next/headers'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
-import DashboardLayoutClient from './layout.client'
-import { redirect } from 'next/navigation';
-import { ReactNode } from 'react';
+import DashboardLayoutClient from '../../components/dashboard/DashboardLayoutClient'
+import { redirect } from 'next/navigation'
+import { ReactNode } from 'react'
 import config from '@/config'
 
-export default async function LayoutPrivate({
+export default async function DashboardLayout({
   children,
 }: {
   children: ReactNode;

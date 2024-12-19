@@ -1,5 +1,9 @@
 "use client"
 
+import { Card } from "@/components/ui/card"
+import { CardHeader } from "@/components/ui/card"
+import { CardContent } from "@/components/ui/card"
+import { CardTitle } from "@/components/ui/card"
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 
 const data = [
@@ -53,11 +57,16 @@ const data = [
   },
 ]
 
-export function Overview() {
+export function RevenueBarChart() {
   return (
-    <ResponsiveContainer width="100%" height={350}>
-      <BarChart data={data}>
-        <XAxis
+      <Card className="col-span-4">
+        <CardHeader>
+          <CardTitle>Revenue</CardTitle>
+        </CardHeader>
+        <CardContent className="pl-2">
+        <ResponsiveContainer width="100%" height={350}>
+          <BarChart data={data}>
+            <XAxis
           dataKey="name"
           stroke="#888888"
           fontSize={12}
@@ -76,8 +85,10 @@ export function Overview() {
           fill="currentColor"
           radius={[4, 4, 0, 0]}
           className="fill-primary"
-        />
-      </BarChart>
-    </ResponsiveContainer>
+            />
+          </BarChart>
+        </ResponsiveContainer>
+        </CardContent>
+      </Card>
   )
 }

@@ -16,25 +16,6 @@ export default function DocumentsPage() {
   return (
     <SidebarInset>
       <div className="h-screen flex flex-col">
-        <header className="flex flex-col shrink-0 border-b">
-          <div className="flex h-16 items-center gap-2 px-6">
-            <div className="flex items-center text-md font-semibold">
-              Documents
-            </div>
-          </div>
-          {showMobileContent && (
-            <div className="flex items-center px-6 pb-4 md:hidden">
-              <Button
-                variant="ghost"
-                onClick={() => setShowMobileContent(false)}
-                className="flex items-center gap-2"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Back to list
-              </Button>
-            </div>
-          )}
-        </header>
         <div className="flex-1 flex overflow-hidden">
           <div className={`${showMobileContent ? 'hidden md:block' : 'block'} flex-1 md:flex-none overflow-y-auto`}>
             <DocumentList 

@@ -4,12 +4,12 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Progress } from "@/components/ui/progress"
 import { createClient } from '@/libs/supabase/client'
-import { toast } from "react-hot-toast"
 import Step1BasicInfo from './steps/step1-basic-info'
 import Step2CompanyDetails from './steps/step2-company-details'
 import Step3AdditionalInfo from './steps/step3-additional-info'
 import Step4FinalSetup from './steps/step4-final-setup'
 import type { OnboardingData } from '@/types'
+import { toast } from 'sonner'
 
 export default function OnboardingPage() {
   const router = useRouter()

@@ -48,7 +48,7 @@ import { NavUser } from "@/components/shipfast/nav-user"
 
 const supabase = createClient()
 
-export function AppSidebar() {
+export function MainSidebar() {
   const pathname = usePathname()
   const [user, setUser] = useState<User & { is_admin?: boolean }>(null)
 
@@ -141,9 +141,9 @@ export function AppSidebar() {
     tools: [
       {
         name: "Prospecting",
-        url: "/prospecting",
+        url: "/prospects",
         icon: Search,
-        isActive: pathname.startsWith("/prospecting")
+        isActive: pathname.startsWith("/prospects")
       },
       {
         name: "Proposal Generator",

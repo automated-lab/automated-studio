@@ -1,12 +1,15 @@
 'use client'
 
 import { ReactNode, useContext, useState } from "react"
+import { usePathname } from "next/navigation"
 import { User } from '@supabase/auth-helpers-nextjs'
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/dashboard/app-sidebar"
+import { MainSidebar } from "@/components/dashboard/MainSidebar"
 import { Toaster } from "@/components/ui/toaster"
 import { CopilotPopup } from "@copilotkit/react-ui"
 import { DashboardContext } from "@/contexts/DashboardContext"
+import { Search } from "@/components/dashboard/overview/search"
+import { UserNav } from "@/components/dashboard/overview/user-nav"
 
 export default function DashboardLayoutClient({
   children,
@@ -15,6 +18,7 @@ export default function DashboardLayoutClient({
   children: ReactNode;
   user: User;
 }) {
+  const pathname = usePathname()
   const [metrics, setMetrics] = useState({
     totalRevenue: 0,
     clientCount: 0,
@@ -22,11 +26,37 @@ export default function DashboardLayoutClient({
     mrrGrowth: 0
   })
 
+  const getPageTitle = (path: string) => {
+    const routes: Record<string, string> = {
+      '/dashboard': 'Dashboard',
+      '/clients': 'Clients',
+      '/automations': 'Automations',
+      '/settings': 'Settings',
+      '/admin': 'Admin Portal',
+      '/prospects': 'Prospecting',
+      // Add more routes as needed
+    }
+    return routes[path] || 'Dashboard'
+  }
+
   return (
     <DashboardContext.Provider value={{ metrics, setMetrics }}>
       <SidebarProvider>
-        <AppSidebar />
+        <MainSidebar />
         <SidebarInset>
+          <div className="hidden flex-col md:flex">
+            <div className="border-b">
+              <div className="flex h-16 items-center px-4">
+                <div className="text-lg font-semibold">
+                  {getPageTitle(pathname)}
+                </div>
+                <div className="ml-auto flex items-center space-x-4">
+                  <Search />
+                  <UserNav />
+                </div>
+              </div>
+            </div>
+          </div>
           {children}
           <CopilotPopup
             instructions={`You are assisting the user as best as you can. You have access to the following dashboard metrics:
