@@ -67,6 +67,7 @@
     "recharts": "^2.15.0",
     "remark-gfm": "^4.0.0",
     "resend": "^4.0.1",
+    "sharp": "^0.33.5",
     "sonner": "^1.7.1",
     "stripe": "^13.11.0",
     "tailwind-merge": "^2.5.5",

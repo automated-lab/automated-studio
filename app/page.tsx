@@ -4,13 +4,11 @@ export default function Page() {
   return (
     <>
       <main className="flex min-h-screen flex-col items-center justify-center text-center gap-12 p-8">
-        
-
         <a
-          className="btn btn-primary"
-          href="/dashboard"
+          className="btn"
+          href="/login"
         >
-          Dashboard{" "}
+          Login{" "}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
