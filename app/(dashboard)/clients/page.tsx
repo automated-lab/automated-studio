@@ -1,5 +1,6 @@
+export const dynamic = 'force-dynamic'
+
 import ClientsList from '../../../components/clients/clients-list'
-import { MainNav } from '@/components/dashboard/overview/main-nav'
 
 export default function ClientsPage() {
   return (

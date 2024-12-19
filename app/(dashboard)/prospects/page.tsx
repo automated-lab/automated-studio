@@ -1,4 +1,5 @@
 'use client'
+export const dynamic = 'force-dynamic'
 
 import * as React from "react"
 import { Search, Filter, MapPin, Star, MessageSquare, Share2, Building2, ArrowRight } from 'lucide-react'

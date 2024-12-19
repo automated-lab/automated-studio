@@ -1,12 +1,11 @@
 "use client"
+export const dynamic = 'force-dynamic'
 
 import { SidebarInset } from "@/components/ui/sidebar"
 import { SnippetList } from "../../../components/snippets/snippet-list"
 import { SnippetContent } from "../../../components/snippets/snippet-content"
 import { useState } from "react"
 import type { Snippet } from "@/libs/airtable"
-import { Button } from "@/components/ui/button"
-import { ChevronLeft } from "lucide-react"
 
 export default function SnippetsPage() {
   const [selectedSnippetId, setSelectedSnippetId] = useState<string>("")

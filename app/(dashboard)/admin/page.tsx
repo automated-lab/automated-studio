@@ -1,7 +1,10 @@
+export const dynamic = 'force-dynamic'
+
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import AdminPortal from "@/components/admin/AdminPortal"
+
 
 export default async function AdminPage() {
   const supabase = createServerComponentClient({ cookies })

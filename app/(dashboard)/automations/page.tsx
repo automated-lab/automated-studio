@@ -1,12 +1,11 @@
 "use client"
+export const dynamic = 'force-dynamic'
 
 import { SidebarInset } from "@/components/ui/sidebar"
 import { AutomationList } from "../../../components/automations/automation-list"
 import { AutomationContent } from "../../../components/automations/automation-content"
 import { useState } from "react"
 import type { Automation } from "@/libs/airtable"
-import { ChevronLeft } from "lucide-react"
-import { Button } from "@/components/ui/button"
 
 export default function AutomationsPage() {
   const [selectedAutomationId, setSelectedAutomationId] = useState<string>("")

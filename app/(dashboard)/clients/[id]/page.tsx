@@ -1,4 +1,5 @@
 'use client'
+export const dynamic = 'force-dynamic'
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
@@ -11,7 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Pencil, ChevronLeft, Loader2 } from "lucide-react"
 import Link from 'next/link'
 import { ProductsTab } from '@/components/clients/ProductsTab'
-import { Product } from '@/types/database'
+
 
 export default function ClientPage() {
   const params = useParams()

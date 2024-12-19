@@ -1,12 +1,11 @@
 "use client"
+export const dynamic = 'force-dynamic'
 
 import { SidebarInset } from "@/components/ui/sidebar"
 import { DocumentList } from "../../../components/documents/document-list"
 import { DocumentContent } from "../../../components/documents/document-content"
 import { useState } from "react"
 import type { Document } from "@/libs/airtable"
-import { ChevronLeft } from "lucide-react"
-import { Button } from "@/components/ui/button"
 
 export default function DocumentsPage() {
   const [selectedDocumentId, setSelectedDocumentId] = useState<string>("")

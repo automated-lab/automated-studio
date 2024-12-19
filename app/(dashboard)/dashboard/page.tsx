@@ -1,25 +1,18 @@
+export const dynamic = 'force-dynamic'
+
 import { Metadata } from "next"
 import Image from "next/image"
 
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
-import { MainNav } from "@/components/dashboard/overview/main-nav"
 import { RevenueBarChart } from "@/components/dashboard/overview/RevenueBarChart"
 import { RecentSales } from "@/components/dashboard/overview/RecentSalesCard"
-import { Search } from "@/components/dashboard/overview/search"
-import { UserNav } from "@/components/dashboard/overview/user-nav"
 import { TopCards } from "@/components/dashboard/overview/TopCards"
 
 export const metadata: Metadata = {

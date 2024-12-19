@@ -12,6 +12,7 @@ const nextConfig = {
       "v5.airtableusercontent.com",
     ],
   },
+  output: 'standalone',
 };
 
 module.exports = nextConfig;

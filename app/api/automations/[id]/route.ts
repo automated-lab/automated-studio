@@ -1,6 +1,8 @@
 import { getAutomationById } from "@/libs/airtable"
 import { NextResponse } from "next/server"
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
