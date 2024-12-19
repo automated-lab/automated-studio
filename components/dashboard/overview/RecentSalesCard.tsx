@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/libs/supabase/client'
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import Link from 'next/link'
 
 const supabase = createClient()
 
@@ -69,9 +70,13 @@ export function RecentSales() {
         <CardDescription>You made {recentClients.length} sales this month.</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-8">
+        <div className="space-y-4">
           {recentClients.map((client) => (
-            <div key={client.id} className="flex items-center">
+            <Link 
+              href={`/clients/${client.id}`} 
+              key={client.id}
+              className="flex items-center hover:bg-muted rounded-md p-2 transition-colors"
+            >
               <Avatar className="h-9 w-9">
                 <AvatarFallback>
                   {client.company_name.split(' ').map((n: string) => n[0]).join('')}
@@ -83,7 +88,7 @@ export function RecentSales() {
               <div className="ml-auto font-medium">
                 +${client.monthly_value.toFixed(2)}
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </CardContent>

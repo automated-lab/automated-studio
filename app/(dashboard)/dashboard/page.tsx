@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { Metadata } from "next"
 import Image from "next/image"
-
+import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 import {
@@ -14,6 +14,7 @@ import {
 import { RevenueBarChart } from "@/components/dashboard/overview/RevenueBarChart"
 import { RecentSales } from "@/components/dashboard/overview/RecentSalesCard"
 import { TopCards } from "@/components/dashboard/overview/TopCards"
+import Link from "next/link"
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -50,7 +51,15 @@ export default function DashboardPage() {
                   <TabsTrigger value="reports" disabled>Reports</TabsTrigger>
                   <TabsTrigger value="notifications" disabled>Notifications</TabsTrigger>
                 </TabsList>
-                <Button>Download</Button>
+                <div className="flex items-center">
+                <Button variant="outline" className="mr-2">Download PDF</Button>
+                <Link href="/clients/create">
+                  <Button>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add New Client
+                  </Button>
+                  </Link>
+                </div>
               </div>
               <TabsContent value="overview">
                 <TopCards />
