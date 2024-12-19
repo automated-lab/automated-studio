@@ -1,0 +1,6 @@
+{
+  "crons": [{
+    "path": "/api/cron/calculate-metrics?api_key=${CRON_SECRET}",
+    "schedule": "0 0 * * *"
+  }]
+} 

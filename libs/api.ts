@@ -1,5 +1,5 @@
 import axios from "axios";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import { redirect } from "next/navigation";
 import config from "@/config";
 

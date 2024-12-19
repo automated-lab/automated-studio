@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/tabs"
 import { MainNav } from "@/components/dashboard/overview/main-nav"
 import { RevenueBarChart } from "@/components/dashboard/overview/RevenueBarChart"
-import { RecentSales } from "@/components/dashboard/overview/recent-sales"
+import { RecentSales } from "@/components/dashboard/overview/RecentSalesCard"
 import { Search } from "@/components/dashboard/overview/search"
 import { UserNav } from "@/components/dashboard/overview/user-nav"
 import { TopCards } from "@/components/dashboard/overview/TopCards"

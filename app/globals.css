@@ -53,6 +53,7 @@ progress::-webkit-progress-value {
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --chart-bar: hsl(142, 76%, 36%); /* Green in light mode */
   }
   .dark {
     --background: 20 14.3% 4.1%;
@@ -87,6 +88,7 @@ progress::-webkit-progress-value {
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --chart-bar: hsl(143, 70%, 30%); /* Darker green in dark mode */
   }
 }
 

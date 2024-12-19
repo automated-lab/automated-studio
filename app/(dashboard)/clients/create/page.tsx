@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { toast } from "react-hot-toast"
+import { toast } from "sonner"
 import { createClient } from '@/libs/supabase/client'
 
 import { Button } from "@/components/ui/button"

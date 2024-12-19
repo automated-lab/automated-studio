@@ -23,7 +23,13 @@ export default function DashboardLayoutClient({
     totalRevenue: 0,
     clientCount: 0,
     activeProducts: 0,
-    mrrGrowth: 0
+    mrrGrowth: 0,
+    revenueChange: 0,
+    clientChange: 0,
+    productsChange: 0,
+    newCustomers: 0,
+    churnedCustomers: 0,
+    historicalRevenue: []
   })
 
   const getPageTitle = (path: string) => {
@@ -61,9 +67,20 @@ export default function DashboardLayoutClient({
           <CopilotPopup
             instructions={`You are assisting the user as best as you can. You have access to the following dashboard metrics:
       - Total Monthly Recurring Revenue: $${metrics.totalRevenue}/mo
+      - MRR Change: ${metrics.revenueChange > 0 ? '+' : ''}${metrics.revenueChange}% from last month
       - Active Clients: ${metrics.clientCount}
+      - Client Growth: ${metrics.clientChange > 0 ? '+' : ''}${metrics.clientChange}% from last month
       - Active Products: ${metrics.activeProducts}
-      - MRR Growth: $${metrics.mrrGrowth}/mo`}
+      - Product Growth: ${metrics.productsChange > 0 ? '+' : ''}${metrics.productsChange}% from last month
+      - MRR Growth: $${metrics.mrrGrowth}/mo
+      - New Customers This Month: ${metrics.newCustomers}
+      - Churned Customers: ${metrics.churnedCustomers}
+      
+      Historical Revenue Data:
+      ${metrics.historicalRevenue.map(m => 
+        `${m.year}-${m.month.toString().padStart(2, '0')}: $${m.revenue}`
+      ).join('\n      ')}
+    `}
             labels={{
               title: "Popup Assistant",
               initial: "Need any help?",

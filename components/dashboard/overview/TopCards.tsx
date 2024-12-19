@@ -14,6 +14,12 @@ type ClientProduct = {
   };
 }
 
+type HistoricalMetric = {
+  month: number;
+  year: number;
+  total_revenue: number;
+}
+
 export function TopCards() {
   const { setMetrics } = useContext(DashboardContext)
   const [clientCount, setClientCount] = useState(0)
@@ -23,36 +29,60 @@ export function TopCards() {
   const [activeProducts, setActiveProducts] = useState(0)
   const [productsChange, setProductsChange] = useState(0)
   const [activeNow, setActiveNow] = useState(0)
-
-  useEffect(() => {
-    async function fetchClients() {
-      const { count } = await supabase
-        .from('clients')
-        .select('*', { count: 'exact', head: true })
-
-      if (count !== null) {
-        setClientCount(count)
-      }
-    }
-
-    fetchClients()
-  }, [])
+  const [currentMetrics, setCurrentMetrics] = useState(null)
+  const [historicalMetrics, setHistoricalMetrics] = useState(null)
 
   useEffect(() => {
     async function fetchRevenue() {
-      const { data: clientProducts } = await supabase
-        .from('client_products')
-        .select<any, ClientProduct>(`
-          is_active,
-          price,
-          product:products (suggested_price)
-        `)
-        .eq('is_active', true)
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
 
-      if (clientProducts) {
-        const total = clientProducts.reduce((sum, cp) => 
-          sum + (cp.price || cp.product.suggested_price || 0), 0)
-        setTotalRevenue(total)
+      const { data: currentMetrics } = await supabase
+        .from('revenue_metrics')
+        .select('total_revenue, total_customers, total_active_products, new_customers, churned_customers')
+        .eq('profile_id', user.id)
+        .eq('year', new Date().getFullYear())
+        .eq('month', new Date().getMonth() + 1)
+        .single()
+
+      const { data: lastMonthMetrics } = await supabase
+        .from('revenue_metrics')
+        .select('total_revenue, total_customers, total_active_products')
+        .eq('profile_id', user.id)
+        .eq('year', new Date().getMonth() === 0 ? new Date().getFullYear() - 1 : new Date().getFullYear())
+        .eq('month', new Date().getMonth() === 0 ? 12 : new Date().getMonth())
+        .single()
+
+      const { data: historicalMetrics } = await supabase
+        .from('revenue_metrics')
+        .select('total_revenue, year, month')
+        .eq('profile_id', user.id)
+        .order('year', { ascending: true })
+        .order('month', { ascending: true })
+        .limit(12)
+
+      if (currentMetrics) {
+        setTotalRevenue(currentMetrics.total_revenue)
+        setClientCount(currentMetrics.total_customers)
+        setActiveProducts(currentMetrics.total_active_products)
+
+        // Calculate percentage changes
+        if (lastMonthMetrics) {
+          const revChange = Number((((currentMetrics.total_revenue - lastMonthMetrics.total_revenue) / lastMonthMetrics.total_revenue) * 100).toFixed(1))
+          const clientChg = Number((((currentMetrics.total_customers - lastMonthMetrics.total_customers) / lastMonthMetrics.total_customers) * 100).toFixed(1))
+          const prodChg = Number((((currentMetrics.total_active_products - lastMonthMetrics.total_active_products) / lastMonthMetrics.total_active_products) * 100).toFixed(1))
+          
+          setRevenueChange(revChange)
+          setClientChange(clientChg)
+          setProductsChange(prodChg)
+          setActiveNow(currentMetrics.total_revenue - lastMonthMetrics.total_revenue)
+        }
+
+        setCurrentMetrics(currentMetrics)
+      }
+
+      if (historicalMetrics) {
+        setHistoricalMetrics(historicalMetrics)
       }
     }
 
@@ -60,69 +90,23 @@ export function TopCards() {
   }, [])
 
   useEffect(() => {
-    async function fetchActiveProducts() {
-      const { count } = await supabase
-        .from('client_products')
-        .select('*', { count: 'exact', head: true })
-        .eq('is_active', true)
-
-      if (count !== null) {
-        setActiveProducts(count)
-      }
-    }
-
-    fetchActiveProducts()
-  }, [])
-
-  useEffect(() => {
-    async function fetchRevenueGrowth() {
-      const firstDayLastMonth = new Date()
-      firstDayLastMonth.setMonth(firstDayLastMonth.getMonth() - 1)
-      firstDayLastMonth.setDate(1)
-
-      const { data: currentProducts } = await supabase
-        .from('client_products')
-        .select<any, ClientProduct>(`
-          is_active,
-          price,
-          product:products (suggested_price),
-          created_at
-        `)
-        .eq('is_active', true)
-
-      const { data: lastMonthProducts } = await supabase
-        .from('client_products')
-        .select<any, ClientProduct>(`
-          is_active,
-          price,
-          product:products (suggested_price),
-          created_at
-        `)
-        .eq('is_active', true)
-        .lt('created_at', firstDayLastMonth.toISOString())
-
-      if (currentProducts && lastMonthProducts) {
-        const currentRevenue = currentProducts.reduce((sum, cp) => 
-          sum + (cp.price || cp.product.suggested_price || 0), 0)
-        const lastMonthRevenue = lastMonthProducts.reduce((sum, cp) => 
-          sum + (cp.price || cp.product.suggested_price || 0), 0)
-        const growth = currentRevenue - lastMonthRevenue
-
-        setActiveNow(growth)
-      }
-    }
-
-    fetchRevenueGrowth()
-  }, [])
-
-  useEffect(() => {
     setMetrics({
       totalRevenue,
       clientCount,
       activeProducts,
-      mrrGrowth: activeNow
+      mrrGrowth: activeNow,
+      revenueChange,
+      clientChange,
+      productsChange,
+      newCustomers: currentMetrics?.new_customers || 0,
+      churnedCustomers: currentMetrics?.churned_customers || 0,
+      historicalRevenue: historicalMetrics?.map((m: HistoricalMetric) => ({
+        month: m.month,
+        year: m.year,
+        revenue: m.total_revenue
+      })) || []
     })
-  }, [totalRevenue, clientCount, activeProducts, activeNow])
+  }, [totalRevenue, clientCount, activeProducts, activeNow, revenueChange, clientChange, productsChange, currentMetrics, historicalMetrics])
 
   return (
     <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4 mb-3">
@@ -219,7 +203,7 @@ export function TopCards() {
         <CardContent>
           <div className="text-2xl font-bold">+${activeNow.toFixed(0)}</div>
           <p className="text-xs text-muted-foreground">
-            MRR growth this month
+            {activeNow > 0 ? '+' : ''}{((activeNow / (totalRevenue - activeNow)) * 100).toFixed(1)}% this month
           </p>
         </CardContent>
       </Card>

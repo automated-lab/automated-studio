@@ -6,7 +6,7 @@ import { useEffect, useState, ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { Crisp } from "crisp-sdk-web";
 import NextTopLoader from "nextjs-toploader";
-import { Toaster } from "react-hot-toast";
+import { Toaster } from "sonner";
 import { Tooltip } from "react-tooltip";
 import config from "@/config";
 
