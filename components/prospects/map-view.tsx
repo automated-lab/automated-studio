@@ -1,9 +1,11 @@
 'use client'
+export const dynamic = 'force-dynamic'
 
 import * as React from "react"
-import { MapPin, Building2, Star, ArrowRight } from 'lucide-react'
+import { MapPin, Building2, Star, ArrowRight, Flame, ThumbsDown, Medal, AlertCircle } from 'lucide-react'
 import { useLoadScript, GoogleMap, InfoWindow, Marker, Libraries } from '@react-google-maps/api'
 import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 const libraries: Libraries = ['places'] as const
 
@@ -29,12 +31,58 @@ interface MapViewProps {
   center: { lat: number; lng: number }
   selectedBusinessId?: number
   onMarkerClick?: (businessId: number, mapInstance?: google.maps.Map) => void
+  shouldPanTo: boolean
 }
 
-export function MapView({ businesses, center, selectedBusinessId, onMarkerClick }: MapViewProps) {
+const getReviewPotential = (rating?: number, totalRatings?: number) => {
+  if (!rating || !totalRatings) return null
+  
+  // High potential scenarios
+  if (totalRatings < 50) return {
+    icon: Flame,
+    color: 'text-orange-500',
+    label: 'High Potential',
+    description: 'Low review count - perfect candidate for review management'
+  }
+  
+  if (rating < 4.0) return {
+    icon: AlertCircle,
+    color: 'text-red-500',
+    label: 'Urgent Need',
+    description: 'Low rating indicates critical need for review management'
+  }
+  
+  if (totalRatings < 100 && rating > 4.0) return {
+    icon: Medal,
+    color: 'text-blue-500',
+    label: 'Growth Potential',
+    description: 'Good rating but could benefit from more reviews'
+  }
+  
+  // Low potential
+  return {
+    icon: ThumbsDown,
+    color: 'text-gray-400',
+    label: 'Low Potential',
+    description: 'Established review presence'
+  }
+}
+
+export function MapView({ businesses, center, selectedBusinessId, onMarkerClick, shouldPanTo }: MapViewProps) {
   const [map, setMap] = React.useState<google.maps.Map | null>(null)
   const [selectedBusiness, setSelectedBusiness] = React.useState<Business | null>(null)
   const initialCenter = React.useRef(center)
+
+  React.useEffect(() => {
+    if (map && center && shouldPanTo) {
+      map.panTo(center)
+      map.setZoom(13)
+    }
+  }, [center, map, shouldPanTo])
+
+  React.useEffect(() => {
+    setSelectedBusiness(null)
+  }, [businesses])
 
   React.useEffect(() => {
     if (selectedBusinessId !== undefined) {
@@ -42,14 +90,13 @@ export function MapView({ businesses, center, selectedBusinessId, onMarkerClick 
       if (business && map && business.coordinates) {
         setSelectedBusiness(business)
         map.panTo(business.coordinates)
-        map.setZoom(15)
+        map.setZoom(14)
       }
     }
   }, [selectedBusinessId, businesses, map])
 
   const onLoad = React.useCallback((map: google.maps.Map) => {
     setMap(map)
-    onMarkerClick?.(-2, map)
   }, [onMarkerClick])
 
   const onUnmount = React.useCallback(() => {
@@ -108,14 +155,7 @@ export function MapView({ businesses, center, selectedBusinessId, onMarkerClick 
               disableAutoPan: false
             }}
           >
-            <div 
-              style={{ 
-                overflow: 'hidden',
-                maxHeight: 'none',
-                padding: '4px'
-              }} 
-              className="min-w-[250px] max-w-[400px]"
-            >
+            <div className="p-2 min-w-[250px] max-w-[400px]">
               <h3 className="text-xl font-semibold mb-2 truncate">{selectedBusiness.name}</h3>
               <div className="text-sm text-muted-foreground mb-2">
                 <div className="flex items-start">
@@ -125,7 +165,8 @@ export function MapView({ businesses, center, selectedBusinessId, onMarkerClick 
                 {selectedBusiness.rating && (
                   <div className="flex items-center mt-1">
                     <Star className="h-3 w-3 mr-1 text-yellow-400 flex-shrink-0" />
-                    {selectedBusiness.rating} ({selectedBusiness.totalRatings})
+                    <span className="text-sm">{selectedBusiness.rating}</span>
+                    <span className="text-xs text-gray-500 ml-1">({selectedBusiness.totalRatings})</span>
                   </div>
                 )}
               </div>
