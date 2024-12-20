@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/sheet"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MapView } from "@/components/prospects/map-view"
+import { useProspectStore } from "@/src/store/useProspectStore"
 
 // Add this outside your component
 const libraries: Libraries = ['places'] as const
@@ -57,9 +58,8 @@ export default function ProspectingInterface() {
   })
 
   // Add state for search query and results
-  const [searchQuery, setSearchQuery] = React.useState("")
+  const { searchQuery, setSearchQuery, locationSearch: storedLocation, setLocationSearch, location, setLocation } = useProspectStore()
   const [searchResults, setSearchResults] = React.useState<google.maps.places.PlaceResult[]>([])
-  const [location, setLocation] = React.useState({ lat: -33.8688, lng: 151.2093 }) // Default to Sydney
   const [mapRef, setMapRef] = React.useState<google.maps.Map | null>(null);
   const [selectedBusinessId, setSelectedBusinessId] = React.useState<number>()
 
@@ -68,7 +68,7 @@ export default function ProspectingInterface() {
     ready: locationReady,
     value: locationSearch,
     suggestions: { status: locationStatus, data: locationSuggestions },
-    setValue: setLocationSearch,
+    setValue: setLocationValue,
     clearSuggestions: clearLocationSuggestions
   } = usePlacesAutocomplete({
     requestOptions: { 
@@ -81,9 +81,17 @@ export default function ProspectingInterface() {
   // Add some console logs to debug
   console.log('Script loaded:', isLoaded, 'Location ready:', locationReady)
 
+  // Add console logs
+  console.log('Store values:', { searchQuery, storedLocation, location })
+
   // Handle search
   const handleSearch = React.useCallback(() => {
     if (!isLoaded || !searchQuery) return
+
+    // Move map to search location
+    if (mapRef) {
+      mapRef.panTo({ lat: location.lat, lng: location.lng })
+    }
 
     const service = new google.maps.places.PlacesService(mapNode!)
     
@@ -122,7 +130,7 @@ export default function ProspectingInterface() {
         setSearchResults(sortedResults);
       }
     })
-  }, [isLoaded, searchQuery, location])
+  }, [isLoaded, searchQuery, location, mapRef])
 
   // Handle map load
   const onMapLoad = React.useCallback((map: google.maps.Map) => {
@@ -131,17 +139,18 @@ export default function ProspectingInterface() {
 
   // Handle location selection
   const handleLocationSelect = async (description: string) => {
-    setLocationSearch(description, false);
-    clearLocationSuggestions();
+    setLocationValue(description, false)
+    setLocationSearch(description)
+    clearLocationSuggestions()
 
     try {
-      const results = await getGeocode({ address: description });
-      const { lat, lng } = await getLatLng(results[0]);
-      setLocation({ lat, lng });
+      const results = await getGeocode({ address: description })
+      const { lat, lng } = await getLatLng(results[0])
+      setLocation({ lat, lng }) // This will update the store but won't move map
     } catch (error) {
-      console.error('Error selecting location:', error);
+      console.error('Error selecting location:', error)
     }
-  };
+  }
 
   // Mock data for demonstration
   const businesses = [
@@ -204,15 +213,18 @@ export default function ProspectingInterface() {
   // Add reset handler
   const handleReset = () => {
     setSearchQuery('')
+    setLocationValue('')
     setLocationSearch('')
     setSearchResults([])
     setSelectedBusinessId(undefined)
-    // Reset to default location (Sydney)
     setLocation({ lat: -33.8688, lng: 151.2093 })
   }
 
-  const handleMarkerClick = async (id: number) => {
-    if (id === -1) {
+  const handleMarkerClick = async (id: number, mapInstance?: google.maps.Map) => {
+    if (id === -2) {
+      // Map reference callback
+      setMapRef(mapInstance!)
+    } else if (id === -1) {
       // Search this area clicked
       if (mapRef) {
         const newCenter = mapRef.getCenter()
@@ -243,6 +255,13 @@ export default function ProspectingInterface() {
       setSelectedBusinessId(id)
     }
   }
+
+  // Add this effect to run search on mount if we have stored values
+  React.useEffect(() => {
+    if (isLoaded && searchQuery && location.lat && location.lng) {
+      handleSearch()
+    }
+  }, [isLoaded]) // Only run on mount when script is loaded
 
   return (
     <div className="flex h-screen">
@@ -277,8 +296,11 @@ export default function ProspectingInterface() {
                     id="search-where"
                     placeholder="suburb or postcode"
                     className="pl-8"
-                    value={locationSearch}
-                    onChange={(e) => setLocationSearch(e.target.value)}
+                    value={storedLocation}
+                    onChange={(e) => {
+                      setLocationValue(e.target.value)
+                      setLocationSearch(e.target.value)
+                    }}
                     disabled={!locationReady}
                   />
                   {/* Location Suggestions Dropdown */}

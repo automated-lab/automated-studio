@@ -28,12 +28,13 @@ interface MapViewProps {
   businesses: Business[]
   center: { lat: number; lng: number }
   selectedBusinessId?: number
-  onMarkerClick?: (businessId: number) => void
+  onMarkerClick?: (businessId: number, mapInstance?: google.maps.Map) => void
 }
 
 export function MapView({ businesses, center, selectedBusinessId, onMarkerClick }: MapViewProps) {
   const [map, setMap] = React.useState<google.maps.Map | null>(null)
   const [selectedBusiness, setSelectedBusiness] = React.useState<Business | null>(null)
+  const initialCenter = React.useRef(center)
 
   React.useEffect(() => {
     if (selectedBusinessId !== undefined) {
@@ -48,17 +49,39 @@ export function MapView({ businesses, center, selectedBusinessId, onMarkerClick 
 
   const onLoad = React.useCallback((map: google.maps.Map) => {
     setMap(map)
-  }, [])
+    onMarkerClick?.(-2, map)
+  }, [onMarkerClick])
 
   const onUnmount = React.useCallback(() => {
     setMap(null)
+  }, [])
+
+  React.useEffect(() => {
+    const style = document.createElement('style')
+    style.textContent = `
+      .gm-style-iw-d {
+        overflow: hidden !important;
+        max-height: none !important;
+      }
+      .gm-style-iw {
+        padding: 12px !important;
+      }
+      .gm-style-iw-c {
+        padding: 16px !important;
+      }
+    `
+    document.head.appendChild(style)
+    
+    return () => {
+      document.head.removeChild(style)
+    }
   }, [])
 
   return (
     <div className="w-full h-full">
       <GoogleMap
         mapContainerClassName="w-full h-full rounded-lg"
-        center={center}
+        center={initialCenter.current}
         zoom={13}
         onLoad={onLoad}
         onUnmount={onUnmount}
@@ -80,19 +103,28 @@ export function MapView({ businesses, center, selectedBusinessId, onMarkerClick 
             position={selectedBusiness.coordinates}
             onCloseClick={() => setSelectedBusiness(null)}
             options={{
-              pixelOffset: new google.maps.Size(0, -35)
+              pixelOffset: new google.maps.Size(0, -35),
+              maxWidth: 400,
+              disableAutoPan: false
             }}
           >
-            <div className="p-2 min-w-[200px]">
-              <h3 className="text-lg font-semibold mb-2">{selectedBusiness.name}</h3>
+            <div 
+              style={{ 
+                overflow: 'hidden',
+                maxHeight: 'none',
+                padding: '4px'
+              }} 
+              className="min-w-[250px] max-w-[400px]"
+            >
+              <h3 className="text-xl font-semibold mb-2 truncate">{selectedBusiness.name}</h3>
               <div className="text-sm text-muted-foreground mb-2">
-                <div className="flex items-center">
-                  <MapPin className="h-3 w-3 mr-1" />
-                  {selectedBusiness.address}
+                <div className="flex items-start">
+                  <MapPin className="h-3 w-3 mr-1 mt-1 flex-shrink-0" />
+                  <span className="break-words">{selectedBusiness.address}</span>
                 </div>
                 {selectedBusiness.rating && (
                   <div className="flex items-center mt-1">
-                    <Star className="h-3 w-3 mr-1 text-yellow-400" />
+                    <Star className="h-3 w-3 mr-1 text-yellow-400 flex-shrink-0" />
                     {selectedBusiness.rating} ({selectedBusiness.totalRatings})
                   </div>
                 )}
