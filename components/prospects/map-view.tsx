@@ -6,6 +6,7 @@ import { MapPin, Building2, Star, ArrowRight, Flame, ThumbsDown, Medal, AlertCir
 import { useLoadScript, GoogleMap, InfoWindow, Marker, Libraries } from '@react-google-maps/api'
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { CustomPlaceResult } from '@/src/store/useProspectStore'
 
 const libraries: Libraries = ['places'] as const
 
@@ -30,7 +31,7 @@ interface MapViewProps {
   businesses: Business[]
   center: { lat: number; lng: number }
   selectedBusinessId?: number
-  onMarkerClick?: (businessId: number, mapInstance?: google.maps.Map) => void
+  onMarkerClick?: (index: number) => void
   shouldPanTo: boolean
 }
 
@@ -88,8 +89,21 @@ export function MapView({ businesses, center, selectedBusinessId, onMarkerClick,
     if (selectedBusinessId !== undefined) {
       const business = businesses.find(b => b.id === selectedBusinessId)
       if (business && map && business.coordinates) {
-        setSelectedBusiness(business)
-        map.panTo(business.coordinates)
+        setSelectedBusiness({
+          id: business.id || 0,
+          name: business.name || '',
+          address: business.address || '',
+          coordinates: {
+            lat: business.coordinates.lat,
+            lng: business.coordinates.lng
+          },
+          rating: business.rating,
+          totalRatings: business.totalRatings
+        })
+        map.panTo({
+          lat: business.coordinates.lat,
+          lng: business.coordinates.lng
+        })
         map.setZoom(14)
       }
     }
@@ -134,13 +148,15 @@ export function MapView({ businesses, center, selectedBusinessId, onMarkerClick,
         onUnmount={onUnmount}
         options={mapOptions}
       >
-        {businesses.map((business) => (
+        {businesses.map((business, index) => (
           business.coordinates && (
             <Marker
-              key={business.id}
-              position={business.coordinates}
-              title={business.name}
-              onClick={() => setSelectedBusiness(business)}
+              key={index}
+              position={new google.maps.LatLng(
+                Number(business.coordinates.lat),
+                Number(business.coordinates.lng)
+              )}
+              onClick={() => onMarkerClick?.(business.id)}
             />
           )
         ))}

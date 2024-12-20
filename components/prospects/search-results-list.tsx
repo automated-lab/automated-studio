@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button"
 import { MapPin } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { getReviewPotential } from "@/lib/review-potential" // We'll create this next
+import { CustomPlaceResult } from '@/src/store/useProspectStore'  // Add this import
 
 interface SearchResultsListProps {
-  searchResults: google.maps.places.PlaceResult[]
+  searchResults: CustomPlaceResult[]  // Changed from PlaceResult[]
   onBusinessClick: (index: number) => void
 }
 
@@ -71,7 +72,7 @@ export function SearchResultsList({ searchResults, onBusinessClick }: SearchResu
               <Button
                 size="sm"
                 className="ml-4"
-                onClick={(e) => {
+                onClick={(e: React.MouseEvent) => {
                   e.stopPropagation()
                   console.log("Sending to GHL:", place)
                 }}

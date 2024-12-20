@@ -26,10 +26,11 @@ export default function ProspectingInterface() {
     locationSearch: storedLocation, 
     setLocationSearch, 
     location, 
-    setLocation 
+    setLocation,
+    searchResults,
+    setSearchResults 
   } = useProspectStore()
 
-  const [searchResults, setSearchResults] = React.useState<google.maps.places.PlaceResult[]>([])
   const [mapRef, setMapRef] = React.useState<google.maps.Map | null>(null)
   const [selectedBusinessId, setSelectedBusinessId] = React.useState<number>()
   const [shouldPanTo, setShouldPanTo] = React.useState(false)
@@ -49,6 +50,31 @@ export default function ProspectingInterface() {
     initOnMount: isLoaded
   })
 
+  React.useEffect(() => {
+    if (searchResults?.length > 0 && isLoaded) {
+      // Convert stored results back to proper Google Maps objects
+      const convertedResults = searchResults.map(result => ({
+        ...result,
+        geometry: {
+          ...result.geometry,
+          location: {
+            lat: typeof result.geometry?.location.lat === 'function' 
+              ? (result.geometry?.location.lat as () => number)() 
+              : result.geometry?.location.lat,
+            lng: typeof result.geometry?.location.lng === 'function' 
+              ? (result.geometry?.location.lng as () => number)() 
+              : result.geometry?.location.lng,
+            toJSON: () => ({ 
+              lat: result.geometry?.location.lat,
+              lng: result.geometry?.location.lng 
+            })
+          }
+        }
+      }))
+      setSearchResults(convertedResults)
+    }
+  }, [isLoaded]) // Only run when maps is loaded
+
   const handleSearch = React.useCallback(() => {
     if (!isLoaded || !searchQuery) return
     
@@ -59,7 +85,7 @@ export default function ProspectingInterface() {
     const request = {
       query: searchQuery,
       radius: 5000,
-      type: ['restaurant', 'store', 'gym', 'beauty_salon', 'car_repair'],
+      type: 'establishment',
       location: new google.maps.LatLng(locationForSearch.lat, locationForSearch.lng),
     }
 
@@ -76,30 +102,20 @@ export default function ProspectingInterface() {
           )
           return distance <= 5
         })
-        const sortedResults = filteredResults.sort((a, b) => {
-          if (!a.geometry?.location || !b.geometry?.location) return 0
-          
-          const distanceA = calculateDistance(
-            locationForSearch,
-            { 
-              lat: a.geometry.location.lat(), 
-              lng: a.geometry.location.lng() 
+        
+        const resultsToStore = filteredResults.map(place => ({
+          ...place,
+          geometry: {
+            ...place.geometry,
+            location: {
+              lat: place.geometry?.location.lat(),
+              lng: place.geometry?.location.lng()
             }
-          )
-          
-          const distanceB = calculateDistance(
-            locationForSearch,
-            { 
-              lat: b.geometry.location.lat(), 
-              lng: b.geometry.location.lng() 
-            }
-          )
-          
-          return distanceA - distanceB
-        })
-        setSearchResults(sortedResults)
-        setLocation(locationForSearch)
-        setPreparedLocation(null)
+          }
+        }));
+        setSearchResults(resultsToStore);
+        setLocation(locationForSearch);
+        setPreparedLocation(null);
       }
     })
   }, [isLoaded, searchQuery, preparedLocation, location, mapRef])
@@ -128,18 +144,16 @@ export default function ProspectingInterface() {
     setSelectedBusinessId(index)
   }
 
-  const mapBusinesses = searchResults.map((place, index) => ({
+  const mapBusinesses = searchResults.map((result, index) => ({
     id: index,
-    name: place.name || '',
-    address: place.formatted_address || '',
-    coordinates: place.geometry?.location 
-      ? { 
-          lat: place.geometry.location.lat(), 
-          lng: place.geometry.location.lng() 
-        }
-      : undefined,
-    rating: place.rating,
-    totalRatings: place.user_ratings_total
+    name: result.name || '',
+    address: result.formatted_address || '',
+    coordinates: result.geometry?.location ? {
+      lat: Number(result.geometry.location.lat),
+      lng: Number(result.geometry.location.lng)
+    } : undefined,
+    rating: result.rating,
+    totalRatings: result.user_ratings_total
   }))
 
   return (
