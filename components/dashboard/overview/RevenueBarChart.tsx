@@ -65,10 +65,11 @@ export function RevenueBarChart() {
         <CardTitle>Revenue</CardTitle>
         <CardDescription>Monthly revenue trends</CardDescription>
       </CardHeader>
-      <CardContent className="pl-2">
-        <ChartContainer config={chartConfig}>
-          <ResponsiveContainer width="100%" height={350}>
-            <BarChart data={data} margin={{ top: 20 }}>
+
+      <div className="relative h-[350px] w-full pl-2">
+        <ChartContainer config={chartConfig} className="w-full h-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data} margin={{ top: 30, bottom: 10, left: 0, right: 0 }}>
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey="name"
@@ -101,7 +102,8 @@ export function RevenueBarChart() {
             </BarChart>
           </ResponsiveContainer>
         </ChartContainer>
-      </CardContent>
+      </div>
+
       {data.length > 1 && (
         <CardFooter className="flex-col items-start gap-2 text-sm">
           <div className="flex gap-2 font-medium leading-none">

@@ -87,8 +87,8 @@ export default function DashboardLayoutClient({
     }}>
       <SidebarProvider>
         <MainSidebar />
-        <SidebarInset>
-          <div className="flex h-screen flex-col">
+        <SidebarInset className="h-screen overflow-hidden">
+          <div className="flex h-full flex-col">
             {/* Fixed header */}
             <div className="sticky top-0 z-10 bg-background border-b">
               <div className="flex h-16 items-center px-4">
@@ -102,7 +102,7 @@ export default function DashboardLayoutClient({
               </div>
             </div>
             {/* Scrollable content */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-hidden">
               {children}
             </div>
           </div>
