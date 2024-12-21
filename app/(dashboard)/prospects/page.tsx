@@ -19,6 +19,51 @@ import { getReviewPotential } from "@/lib/review-potential"
 const libraries: Libraries = ['places'] as const
 const mapNode = typeof document !== 'undefined' ? document.createElement('div') : null
 
+// Utility functions
+const getLatLngValue = (location: any): {lat: number, lng: number} => {
+  if (!location) return { lat: 0, lng: 0 }
+
+  // Case 1: location has function properties
+  if (typeof location.lat === 'function') {
+    return {
+      lat: location.lat(),
+      lng: location.lng()
+    }
+  }
+  
+  // Case 2: location is a plain object with number properties
+  if (typeof location.lat === 'number') {
+    return {
+      lat: location.lat,
+      lng: location.lng
+    }
+  }
+
+  // Case 3: fallback for when location is a toJSON()-able object
+  if (location.toJSON) {
+    const { lat, lng } = location.toJSON()
+    return { lat, lng }
+  }
+
+  // Last resort: try to parse numbers from whatever we got
+  return {
+    lat: Number(location.lat || 0),
+    lng: Number(location.lng || 0)
+  }
+}
+
+const calculateDistance = (point1: { lat: number; lng: number }, point2: { lat: number; lng: number }): number => {
+  const R = 6371 // Earth's radius in km
+  const dLat = (point2.lat - point1.lat) * Math.PI / 180
+  const dLon = (point2.lng - point1.lng) * Math.PI / 180
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(point1.lat * Math.PI / 180) * Math.cos(point2.lat * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+  return R * c
+}
+
 export default function ProspectingInterface() {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
@@ -78,66 +123,9 @@ export default function ProspectingInterface() {
     }
   }
 
-  // Utility functions
-  const isLatLng = (location: any): location is google.maps.LatLng => {
-    return isLoaded && location && typeof location.lat === 'function' && typeof location.lng === 'function'
-  }
-
-  const getLatLngValue = (location: any): {lat: number, lng: number} => {
-    if (!location) return { lat: 0, lng: 0 }
-
-    // Case 1: location is a LatLng instance
-    if (isLoaded && location instanceof google.maps.LatLng) {
-      return {
-        lat: location.lat(),
-        lng: location.lng()
-      }
-    }
-    
-    // Case 2: location has function properties
-    if (typeof location.lat === 'function') {
-      return {
-        lat: location.lat(),
-        lng: location.lng()
-      }
-    }
-    
-    // Case 3: location is a plain object with number properties
-    if (typeof location.lat === 'number') {
-      return {
-        lat: location.lat,
-        lng: location.lng
-      }
-    }
-
-    // Case 4: fallback for when location is a toJSON()-able object
-    if (location.toJSON) {
-      const { lat, lng } = location.toJSON()
-      return { lat, lng }
-    }
-
-    // Last resort: try to parse numbers from whatever we got
-    return {
-      lat: Number(location.lat || 0),
-      lng: Number(location.lng || 0)
-    }
-  }
-
-  const calculateDistance = (point1: { lat: number; lng: number }, point2: { lat: number; lng: number }): number => {
-    const R = 6371 // Earth's radius in km
-    const dLat = (point2.lat - point1.lat) * Math.PI / 180
-    const dLon = (point2.lng - point1.lng) * Math.PI / 180
-    const a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(point1.lat * Math.PI / 180) * Math.cos(point2.lat * Math.PI / 180) * 
-      Math.sin(dLon/2) * Math.sin(dLon/2)
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
-    return R * c
-  }
-
   // Event handlers
   const handleSearch = React.useCallback(() => {
-    if (!isLoaded || !searchQuery) return
+    if (!isLoaded || !searchQuery || typeof google === 'undefined') return
     
     setShouldPanTo(true)
     const locationForSearch = preparedLocation || getLatLngValue(location)
@@ -182,7 +170,7 @@ export default function ProspectingInterface() {
         setPreparedLocation(null)
       }
     })
-  }, [isLoaded, searchQuery, preparedLocation, location, setLocation, setSearchResults, getLatLngValue])
+  }, [isLoaded, searchQuery, preparedLocation, location, setLocation, setSearchResults])
 
   const handleLocationSelect = async (description: string) => {
     setLocationValue(description, false)
@@ -210,7 +198,7 @@ export default function ProspectingInterface() {
 
   // Effects
   React.useEffect(() => {
-    if (!isLoaded || !searchResults?.length) return
+    if (!isLoaded || !searchResults?.length || typeof google === 'undefined') return
 
     const needsConversion = searchResults.some(result => 
       !(result.geometry?.location instanceof google.maps.LatLng)
@@ -228,7 +216,7 @@ export default function ProspectingInterface() {
       }))
       setSearchResults(convertedResults)
     }
-  }, [isLoaded, searchResults, setSearchResults, getLatLngValue])
+  }, [isLoaded, searchResults, setSearchResults])
 
   useEffect(() => {
     if (!searchResults?.length) return
@@ -245,17 +233,17 @@ export default function ProspectingInterface() {
       totalResults: searchResults.length,
       currentQuery: searchQuery
     })
-  }, [searchResults, searchQuery, setProspectsState, getLatLngValue])
+  }, [searchResults, searchQuery, setProspectsState])
 
   // Derived state
-  const mapBusinesses = searchResults.map((result, index) => ({
+  const mapBusinesses = React.useMemo(() => searchResults.map((result, index) => ({
     id: index,
     name: result.name || '',
     address: result.formatted_address || '',
     coordinates: result.geometry?.location ? getLatLngValue(result.geometry.location) : undefined,
     rating: result.rating,
     totalRatings: result.user_ratings_total
-  }))
+  })), [searchResults])
 
   return (
     <div className="h-[calc(100vh-10rem)]">
