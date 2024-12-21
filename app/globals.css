@@ -5,6 +5,7 @@
 html,
 body {
   scroll-behavior: smooth !important;
+  height: 100%;
 }
 
 /* It makes the HTML progress bar filling smooth when value change. */

@@ -6,6 +6,7 @@ import { User } from '@supabase/auth-helpers-nextjs'
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { MainSidebar } from "@/components/dashboard/MainSidebar"
 import { Toaster } from "@/components/ui/toaster"
+import { useCopilotReadable } from "@copilotkit/react-core"
 import { CopilotPopup } from "@copilotkit/react-ui"
 import { DashboardContext } from "@/contexts/DashboardContext"
 import { Search } from "@/components/dashboard/overview/search"
@@ -32,6 +33,11 @@ export default function DashboardLayoutClient({
     historicalRevenue: []
   })
 
+  useCopilotReadable({
+    description: "Dashboard metrics and user information",
+    value: { metrics, user }
+  })
+
   const getPageTitle = (path: string) => {
     const routes: Record<string, string> = {
       '/dashboard': 'Dashboard',
@@ -50,8 +56,9 @@ export default function DashboardLayoutClient({
       <SidebarProvider>
         <MainSidebar />
         <SidebarInset>
-          <div className="hidden flex-col md:flex">
-            <div className="border-b">
+          <div className="flex h-screen flex-col">
+            {/* Fixed header */}
+            <div className="sticky top-0 z-10 bg-background border-b">
               <div className="flex h-16 items-center px-4">
                 <div className="text-lg font-semibold">
                   {getPageTitle(pathname)}
@@ -62,31 +69,13 @@ export default function DashboardLayoutClient({
                 </div>
               </div>
             </div>
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto">
+              {children}
+            </div>
           </div>
-          {children}
-          <CopilotPopup
-            instructions={`You are assisting the user as best as you can. You have access to the following dashboard metrics:
-      - Total Monthly Recurring Revenue: $${metrics.totalRevenue}/mo
-      - MRR Change: ${metrics.revenueChange > 0 ? '+' : ''}${metrics.revenueChange}% from last month
-      - Active Clients: ${metrics.clientCount}
-      - Client Growth: ${metrics.clientChange > 0 ? '+' : ''}${metrics.clientChange}% from last month
-      - Active Products: ${metrics.activeProducts}
-      - Product Growth: ${metrics.productsChange > 0 ? '+' : ''}${metrics.productsChange}% from last month
-      - MRR Growth: $${metrics.mrrGrowth}/mo
-      - New Customers This Month: ${metrics.newCustomers}
-      - Churned Customers: ${metrics.churnedCustomers}
-      
-      Historical Revenue Data:
-      ${metrics.historicalRevenue.map(m => 
-        `${m.year}-${m.month.toString().padStart(2, '0')}: $${m.revenue}`
-      ).join('\n      ')}
-    `}
-            labels={{
-              title: "Popup Assistant",
-              initial: "Need any help?",
-            }}
-          />
         </SidebarInset>
+          <CopilotPopup defaultOpen={false} />
         <Toaster />
       </SidebarProvider>
     </DashboardContext.Provider>

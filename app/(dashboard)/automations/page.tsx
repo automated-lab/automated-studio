@@ -13,8 +13,8 @@ export default function AutomationsPage() {
   const [showMobileContent, setShowMobileContent] = useState(false)
 
   return (
-    <SidebarInset>
-      <div className="h-screen flex flex-col">
+    <SidebarInset className="h-screen overflow-hidden">
+      <div className="flex flex-col h-full">
         <div className="flex-1 flex overflow-hidden">
           <div className={`${showMobileContent ? 'hidden md:block' : 'block'} flex-1 md:flex-none overflow-y-auto`}>
             <AutomationList 

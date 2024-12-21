@@ -39,7 +39,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </head>
       )}
       <body>
-      <CopilotKit publicApiKey={process.env.COPILOT_KIT_PUBLIC_KEY}> 
+      <CopilotKit publicApiKey={process.env.NEXT_PUBLIC_COPILOT_API_KEY}> 
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
