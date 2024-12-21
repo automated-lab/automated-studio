@@ -33,9 +33,15 @@ export default function DashboardLayoutClient({
     historicalRevenue: []
   })
 
+  const [prospects, setProspects] = useState({
+    searchResults: [],
+    totalResults: 0,
+    currentQuery: ''
+  })
+
   useCopilotReadable({
     description: "Dashboard metrics and user information",
-    value: { metrics, user }
+    value: { metrics, prospects, user }
   })
 
   const getPageTitle = (path: string) => {
@@ -52,7 +58,12 @@ export default function DashboardLayoutClient({
   }
 
   return (
-    <DashboardContext.Provider value={{ metrics, setMetrics }}>
+    <DashboardContext.Provider value={{ 
+      metrics, 
+      setMetrics,
+      prospectsState: prospects,
+      setProspectsState: setProspects 
+    }}>
       <SidebarProvider>
         <MainSidebar />
         <SidebarInset>

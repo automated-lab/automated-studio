@@ -10,6 +10,9 @@ import { Label } from "@/components/ui/label"
 import { MapView } from "@/components/prospects/map-view"
 import { SearchResultsList } from "@/components/prospects/search-results-list"
 import { useProspectStore } from "@/src/store/useProspectStore"
+import { useContext } from 'react'
+import { DashboardContext } from '@/contexts/DashboardContext'
+import { useEffect } from 'react'
 
 const libraries: Libraries = ['places'] as const
 const mapNode = typeof document !== 'undefined' ? document.createElement('div') : null
@@ -50,6 +53,8 @@ export default function ProspectingInterface() {
     initOnMount: isLoaded
   })
 
+  const { setProspectsState } = useContext(DashboardContext)
+
   React.useEffect(() => {
     if (searchResults?.length > 0 && isLoaded) {
       // Convert stored results back to proper Google Maps objects
@@ -74,6 +79,26 @@ export default function ProspectingInterface() {
       setSearchResults(convertedResults)
     }
   }, [isLoaded]) // Only run when maps is loaded
+
+  // Add useEffect to update global state when search results change
+  useEffect(() => {
+    if (searchResults?.length > 0) {
+      setProspectsState({
+        searchResults: searchResults.map(result => ({
+          name: result.name,
+          address: result.formatted_address,
+          rating: result.rating,
+          totalRatings: result.user_ratings_total,
+          location: {
+            lat: result.geometry?.location.lat,
+            lng: result.geometry?.location.lng
+          }
+        })),
+        totalResults: searchResults.length,
+        currentQuery: searchQuery
+      })
+    }
+  }, [searchResults, searchQuery, setProspectsState])
 
   const handleSearch = React.useCallback(() => {
     if (!isLoaded || !searchQuery) return

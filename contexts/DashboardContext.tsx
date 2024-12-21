@@ -22,6 +22,12 @@ type DashboardMetrics = {
 export const DashboardContext = createContext<{
   metrics: DashboardMetrics;
   setMetrics: (metrics: DashboardMetrics) => void;
+  prospectsState: {
+    searchResults: any[];
+    totalResults: number;
+    currentQuery: string;
+  };
+  setProspectsState: (state: { searchResults: any[]; totalResults: number; currentQuery: string; }) => void;
 }>({
   metrics: {
     totalRevenue: 0,
@@ -35,5 +41,11 @@ export const DashboardContext = createContext<{
     churnedCustomers: 0,
     historicalRevenue: []
   },
-  setMetrics: () => {}
+  setMetrics: () => {},
+  prospectsState: {
+    searchResults: [],
+    totalResults: 0,
+    currentQuery: ''
+  },
+  setProspectsState: () => {}
 }) 
