@@ -70,16 +70,26 @@ const getReviewPotential = (rating?: number, totalRatings?: number) => {
 }
 
 export function MapView({ businesses, center, selectedBusinessId, onMarkerClick, shouldPanTo }: MapViewProps) {
+  const mapRef = React.useRef<google.maps.Map>()
   const [map, setMap] = React.useState<google.maps.Map | null>(null)
   const [selectedBusiness, setSelectedBusiness] = React.useState<Business | null>(null)
   const initialCenter = React.useRef(center)
 
+  const onLoad = React.useCallback((map: google.maps.Map) => {
+    mapRef.current = map
+    setMap(map)
+  }, [])
+
+  const onUnmount = React.useCallback(() => {
+    mapRef.current = undefined
+    setMap(null)
+  }, [])
+
   React.useEffect(() => {
-    if (map && center && shouldPanTo) {
+    if (shouldPanTo && map && center) {
       map.panTo(center)
-      map.setZoom(13)
     }
-  }, [center, map, shouldPanTo])
+  }, [shouldPanTo, map, center])
 
   React.useEffect(() => {
     setSelectedBusiness(null)
@@ -109,14 +119,6 @@ export function MapView({ businesses, center, selectedBusinessId, onMarkerClick,
     }
   }, [selectedBusinessId, businesses, map])
 
-  const onLoad = React.useCallback((map: google.maps.Map) => {
-    setMap(map)
-  }, [onMarkerClick])
-
-  const onUnmount = React.useCallback(() => {
-    setMap(null)
-  }, [])
-
   React.useEffect(() => {
     const style = document.createElement('style')
     style.textContent = `
@@ -139,27 +141,30 @@ export function MapView({ businesses, center, selectedBusinessId, onMarkerClick,
   }, [])
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full rounded-lg overflow-hidden">
       <GoogleMap
-        mapContainerClassName="w-full h-full rounded-lg"
+        mapContainerStyle={{ width: '100%', height: '100%' }}
         center={initialCenter.current}
         zoom={13}
         onLoad={onLoad}
         onUnmount={onUnmount}
-        options={mapOptions}
+        options={{
+          disableDefaultUI: true,
+          zoomControl: true,
+          streetViewControl: true,
+          mapTypeControl: true,
+        }}
       >
-        {businesses.map((business, index) => (
-          business.coordinates && (
+        {businesses.map((business, idx) => 
+          business.coordinates ? (
             <Marker
-              key={index}
-              position={new google.maps.LatLng(
-                Number(business.coordinates.lat),
-                Number(business.coordinates.lng)
-              )}
-              onClick={() => onMarkerClick?.(business.id)}
+              key={business.id}
+              position={business.coordinates}
+              onClick={() => onMarkerClick?.(idx)}
+              animation={selectedBusinessId === idx ? google.maps.Animation.BOUNCE : undefined}
             />
-          )
-        ))}
+          ) : null
+        )}
         
         {selectedBusiness && selectedBusiness.coordinates && (
           <InfoWindow

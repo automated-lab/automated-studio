@@ -1,4 +1,5 @@
 'use client'
+export const dynamic = 'force-dynamic'
 
 import { Search } from "./overview/search"
 import { UserNav } from "./overview/user-nav"

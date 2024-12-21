@@ -1,15 +1,22 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export interface CustomPlaceResult extends Omit<google.maps.places.PlaceResult, 'geometry'> {
-  id?: number;
+export type LocationType = google.maps.LatLng | {
+  lat: () => number;
+  lng: () => number;
+};
+
+export interface CustomPlaceResult {
+  name?: string;
+  formatted_address?: string;
+  rating?: number;
+  user_ratings_total?: number;
   geometry?: {
     location: {
-      lat: number;
-      lng: number;
-    };
-    viewport?: google.maps.LatLngBounds;
-  };
+      lat: () => number;
+      lng: () => number;
+    } | google.maps.LatLng;
+  } | undefined;
 }
 
 interface ProspectState {
@@ -29,7 +36,7 @@ export const useProspectStore = create<ProspectState>()(
       searchQuery: '',
       locationSearch: '',
       location: { lat: -33.8688, lng: 151.2093 }, // Default Sydney
-      searchResults: [],
+      searchResults: [] as CustomPlaceResult[],
       setSearchQuery: (term) => set({ searchQuery: term }),
       setLocationSearch: (location) => set({ locationSearch: location }),
       setLocation: (location) => set({ location }),

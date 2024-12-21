@@ -1,4 +1,5 @@
 'use client'
+export const dynamic = 'force-dynamic'
 
 import { ReactNode, useContext, useState } from "react"
 import { usePathname } from "next/navigation"

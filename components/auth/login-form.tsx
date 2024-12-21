@@ -49,7 +49,7 @@ export function LoginForm() {
         throw error
       }
       
-      toast.success("Check your email for the login link.")
+      toast.success("Check your email.")
     } catch (error) {
       console.log('Caught error:', error)
       toast.error("Something went wrong. Please try again.")

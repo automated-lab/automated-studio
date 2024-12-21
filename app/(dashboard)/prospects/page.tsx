@@ -1,4 +1,5 @@
 'use client'
+export const dynamic = 'force-dynamic'
 
 import * as React from "react"
 import { Search, MapPin } from 'lucide-react'
@@ -9,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { MapView } from "@/components/prospects/map-view"
 import { SearchResultsList } from "@/components/prospects/search-results-list"
-import { useProspectStore } from "@/src/store/useProspectStore"
+import { useProspectStore, LocationType } from "@/src/store/useProspectStore"
 import { useContext } from 'react'
 import { DashboardContext } from '@/contexts/DashboardContext'
 import { useEffect } from 'react'
@@ -40,13 +41,7 @@ export default function ProspectingInterface() {
   const [shouldPanTo, setShouldPanTo] = React.useState(false)
   const [preparedLocation, setPreparedLocation] = React.useState<{ lat: number; lng: number } | null>(null)
 
-  const {
-    ready: locationReady,
-    value: locationSearch,
-    suggestions: { status: locationStatus, data: locationSuggestions },
-    setValue: setLocationValue,
-    clearSuggestions: clearLocationSuggestions
-  } = usePlacesAutocomplete({
+  const placesAutocomplete = usePlacesAutocomplete({
     requestOptions: { 
       types: ['(cities)']
     },
@@ -54,59 +49,98 @@ export default function ProspectingInterface() {
     initOnMount: isLoaded
   })
 
+  const {
+    ready: locationReady,
+    value: locationSearch,
+    suggestions: { status: locationStatus, data: locationSuggestions },
+    setValue: setLocationValue,
+    clearSuggestions: clearLocationSuggestions
+  } = placesAutocomplete
+
   const { setProspectsState } = useContext(DashboardContext)
 
-  React.useEffect(() => {
-    if (searchResults?.length > 0 && isLoaded) {
-      // Convert stored results back to proper Google Maps objects
-      const convertedResults = searchResults.map(result => ({
-        ...result,
-        geometry: {
-          ...result.geometry,
-          location: {
-            lat: typeof result.geometry?.location.lat === 'function' 
-              ? (result.geometry?.location.lat as () => number)() 
-              : result.geometry?.location.lat,
-            lng: typeof result.geometry?.location.lng === 'function' 
-              ? (result.geometry?.location.lng as () => number)() 
-              : result.geometry?.location.lng,
-            toJSON: () => ({ 
-              lat: result.geometry?.location.lat,
-              lng: result.geometry?.location.lng 
-            })
-          }
-        }
-      }))
-      setSearchResults(convertedResults)
+  // Type definitions
+  interface Business {
+    id: number
+    name: string
+    address: string
+    coordinates?: {
+      lat: number
+      lng: number
     }
-  }, [isLoaded]) // Only run when maps is loaded
+    rating?: number
+    totalRatings?: number
+  }
 
-  // Add useEffect to update global state when search results change
-  useEffect(() => {
-    if (searchResults?.length > 0) {
-      setProspectsState({
-        searchResults: searchResults.map(result => ({
-          name: result.name,
-          address: result.formatted_address,
-          rating: result.rating,
-          totalRatings: result.user_ratings_total,
-          location: {
-            lat: result.geometry?.location.lat,
-            lng: result.geometry?.location.lng
-          },
-          reviewPotential: getReviewPotential(result.rating, result.user_ratings_total)
-        })),
-        totalResults: searchResults.length,
-        currentQuery: searchQuery
-      })
+  interface CustomPlaceResult extends google.maps.places.PlaceResult {
+    geometry: {
+      location: google.maps.LatLng
     }
-  }, [searchResults, searchQuery, setProspectsState])
+  }
 
+  // Utility functions
+  const isLatLng = (location: any): location is google.maps.LatLng => {
+    return isLoaded && location && typeof location.lat === 'function' && typeof location.lng === 'function'
+  }
+
+  const getLatLngValue = (location: any): {lat: number, lng: number} => {
+    if (!location) return { lat: 0, lng: 0 }
+
+    // Case 1: location is a LatLng instance
+    if (isLoaded && location instanceof google.maps.LatLng) {
+      return {
+        lat: location.lat(),
+        lng: location.lng()
+      }
+    }
+    
+    // Case 2: location has function properties
+    if (typeof location.lat === 'function') {
+      return {
+        lat: location.lat(),
+        lng: location.lng()
+      }
+    }
+    
+    // Case 3: location is a plain object with number properties
+    if (typeof location.lat === 'number') {
+      return {
+        lat: location.lat,
+        lng: location.lng
+      }
+    }
+
+    // Case 4: fallback for when location is a toJSON()-able object
+    if (location.toJSON) {
+      const { lat, lng } = location.toJSON()
+      return { lat, lng }
+    }
+
+    // Last resort: try to parse numbers from whatever we got
+    return {
+      lat: Number(location.lat || 0),
+      lng: Number(location.lng || 0)
+    }
+  }
+
+  const calculateDistance = (point1: { lat: number; lng: number }, point2: { lat: number; lng: number }): number => {
+    const R = 6371 // Earth's radius in km
+    const dLat = (point2.lat - point1.lat) * Math.PI / 180
+    const dLon = (point2.lng - point1.lng) * Math.PI / 180
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(point1.lat * Math.PI / 180) * Math.cos(point2.lat * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2)
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+    return R * c
+  }
+
+  // Event handlers
   const handleSearch = React.useCallback(() => {
     if (!isLoaded || !searchQuery) return
     
     setShouldPanTo(true)
-    const locationForSearch = preparedLocation || location
+    const locationForSearch = preparedLocation || getLatLngValue(location)
     
     const service = new google.maps.places.PlacesService(mapNode!)
     const request = {
@@ -130,22 +164,25 @@ export default function ProspectingInterface() {
           return distance <= 5
         })
         
-        const resultsToStore = filteredResults.map(place => ({
+        const convertedResults = filteredResults.map(place => ({
           ...place,
           geometry: {
-            ...place.geometry,
-            location: {
-              lat: place.geometry?.location.lat(),
-              lng: place.geometry?.location.lng()
-            }
+            location: new google.maps.LatLng(
+              place.geometry!.location!.lat(),
+              place.geometry!.location!.lng()
+            )
           }
-        }));
-        setSearchResults(resultsToStore);
-        setLocation(locationForSearch);
-        setPreparedLocation(null);
+        })) as CustomPlaceResult[]
+
+        setSearchResults(convertedResults)
+        setLocation({ 
+          lat: locationForSearch.lat, 
+          lng: locationForSearch.lng 
+        })
+        setPreparedLocation(null)
       }
     })
-  }, [isLoaded, searchQuery, preparedLocation, location, mapRef])
+  }, [isLoaded, searchQuery, preparedLocation, location, setLocation, setSearchResults, getLatLngValue])
 
   const handleLocationSelect = async (description: string) => {
     setLocationValue(description, false)
@@ -171,14 +208,51 @@ export default function ProspectingInterface() {
     setSelectedBusinessId(index)
   }
 
+  // Effects
+  React.useEffect(() => {
+    if (!isLoaded || !searchResults?.length) return
+
+    const needsConversion = searchResults.some(result => 
+      !(result.geometry?.location instanceof google.maps.LatLng)
+    )
+    
+    if (needsConversion) {
+      const convertedResults = searchResults.map(result => ({
+        ...result,
+        geometry: {
+          location: new google.maps.LatLng(
+            getLatLngValue(result.geometry?.location).lat,
+            getLatLngValue(result.geometry?.location).lng
+          )
+        }
+      }))
+      setSearchResults(convertedResults)
+    }
+  }, [isLoaded, searchResults, setSearchResults, getLatLngValue])
+
+  useEffect(() => {
+    if (!searchResults?.length) return
+    
+    setProspectsState({
+      searchResults: searchResults.map(result => ({
+        name: result.name,
+        address: result.formatted_address,
+        rating: result.rating,
+        totalRatings: result.user_ratings_total,
+        location: result.geometry?.location ? getLatLngValue(result.geometry.location) : { lat: 0, lng: 0 },
+        reviewPotential: getReviewPotential(result.rating, result.user_ratings_total)
+      })),
+      totalResults: searchResults.length,
+      currentQuery: searchQuery
+    })
+  }, [searchResults, searchQuery, setProspectsState, getLatLngValue])
+
+  // Derived state
   const mapBusinesses = searchResults.map((result, index) => ({
     id: index,
     name: result.name || '',
     address: result.formatted_address || '',
-    coordinates: result.geometry?.location ? {
-      lat: Number(result.geometry.location.lat),
-      lng: Number(result.geometry.location.lng)
-    } : undefined,
+    coordinates: result.geometry?.location ? getLatLngValue(result.geometry.location) : undefined,
     rating: result.rating,
     totalRatings: result.user_ratings_total
   }))
@@ -290,16 +364,8 @@ export default function ProspectingInterface() {
   )
 }
 
-// Helper function
-function calculateDistance(point1: { lat: number; lng: number }, point2: { lat: number; lng: number }): number {
-  const R = 6371
-  const dLat = (point2.lat - point1.lat) * Math.PI / 180
-  const dLon = (point2.lng - point1.lng) * Math.PI / 180
-  const a = 
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(point1.lat * Math.PI / 180) * Math.cos(point2.lat * Math.PI / 180) * 
-    Math.sin(dLon/2) * Math.sin(dLon/2)
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
-  return R * c
-}
+// Add this type guard function
+const isLatLngLiteral = (location: any): location is google.maps.LatLngLiteral => {
+  return location && typeof location.lat === 'function' && typeof location.lng === 'function';
+};
 

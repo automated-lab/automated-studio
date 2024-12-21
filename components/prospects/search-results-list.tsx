@@ -19,7 +19,7 @@ export function SearchResultsList({ searchResults, onBusinessClick }: SearchResu
     <div className="space-y-4">
       {searchResults.map((place, index) => (
         <Card 
-          key={place.place_id} 
+          key={index}
           className="cursor-pointer hover:bg-muted/50 mb-4"
           onClick={() => onBusinessClick(index)}
         >

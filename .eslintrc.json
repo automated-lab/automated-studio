@@ -6,7 +6,8 @@
     "es6": true
   },
   "rules": {
-    // Your specific rules.
+    "no-undef": "warn",
+    "react-hooks/exhaustive-deps": "warn",
     "no-unused-vars": "warn"
   }
 }
