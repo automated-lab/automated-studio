@@ -33,7 +33,27 @@ export default function DashboardLayoutClient({
     historicalRevenue: []
   })
 
-  const [prospects, setProspects] = useState({
+  const [prospects, setProspects] = useState<{
+    searchResults: Array<{
+      name: string;
+      address: string;
+      rating?: number;
+      totalRatings?: number;
+      location: {
+        lat: number;
+        lng: number;
+      };
+      reviewPotential: {
+        icon: any;
+        color: string;
+        label: string;
+        description: string;
+        score: number;
+      } | null;
+    }>;
+    totalResults: number;
+    currentQuery: string;
+  }>({
     searchResults: [],
     totalResults: 0,
     currentQuery: ''

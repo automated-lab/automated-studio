@@ -13,6 +13,7 @@ import { useProspectStore } from "@/src/store/useProspectStore"
 import { useContext } from 'react'
 import { DashboardContext } from '@/contexts/DashboardContext'
 import { useEffect } from 'react'
+import { getReviewPotential } from "@/lib/review-potential"
 
 const libraries: Libraries = ['places'] as const
 const mapNode = typeof document !== 'undefined' ? document.createElement('div') : null
@@ -92,7 +93,8 @@ export default function ProspectingInterface() {
           location: {
             lat: result.geometry?.location.lat,
             lng: result.geometry?.location.lng
-          }
+          },
+          reviewPotential: getReviewPotential(result.rating, result.user_ratings_total)
         })),
         totalResults: searchResults.length,
         currentQuery: searchQuery
@@ -241,7 +243,7 @@ export default function ProspectingInterface() {
                   </Button>
                   <Button 
                     type="button"
-                    variant="outline" 
+                    variant="outline"
                     onClick={handleReset}
                     disabled={!isLoaded}
                   >

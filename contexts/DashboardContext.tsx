@@ -19,15 +19,39 @@ type DashboardMetrics = {
   }>;
 }
 
+type ReviewPotential = {
+  icon: any;
+  color: string;
+  label: string;
+  description: string;
+  score: number;
+}
+
+type ProspectResult = {
+  name: string;
+  address: string;
+  rating?: number;
+  totalRatings?: number;
+  location: {
+    lat: number;
+    lng: number;
+  };
+  reviewPotential: ReviewPotential | null;
+}
+
 export const DashboardContext = createContext<{
   metrics: DashboardMetrics;
   setMetrics: (metrics: DashboardMetrics) => void;
   prospectsState: {
-    searchResults: any[];
+    searchResults: ProspectResult[];
     totalResults: number;
     currentQuery: string;
   };
-  setProspectsState: (state: { searchResults: any[]; totalResults: number; currentQuery: string; }) => void;
+  setProspectsState: (state: { 
+    searchResults: ProspectResult[]; 
+    totalResults: number; 
+    currentQuery: string; 
+  }) => void;
 }>({
   metrics: {
     totalRevenue: 0,
