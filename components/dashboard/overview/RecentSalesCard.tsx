@@ -21,36 +21,39 @@ export function RecentSales() {
   useEffect(() => {
     async function fetchRecentClients() {
       const { data: clientProducts } = await supabase
-        .from('client_products')
+        .from('clients')
         .select(`
-          client:clients (
-            id,
-            company_name,
-            created_at
-          ),
-          price,
-          product:products (
-            suggested_price
+          id,
+          company_name,
+          created_at,
+          client_products!inner(
+            price,
+            product:products (
+              suggested_price
+            )
           )
         `)
-        .eq('is_active', true)
+        .eq('client_products.is_active', true)
         .order('created_at', { ascending: false })
         .limit(5)
+
 
       if (clientProducts) {
         // Transform the data to match our Client type
         const transformedClients = clientProducts.reduce((acc: Client[], cp: any) => {
-          const existingClient = acc.find(c => c.id === cp.client.id)
-          const value = cp.price || cp.product.suggested_price || 0
+          const existingClient = acc.find(c => c.id === cp.id)
+          const totalValue = cp.client_products.reduce((sum: number, product: any) => {
+            return sum + (product.price || product.product.suggested_price || 0)
+          }, 0)
 
           if (existingClient) {
-            existingClient.monthly_value += value
+            existingClient.monthly_value += totalValue
           } else {
             acc.push({
-              id: cp.client.id,
-              company_name: cp.client.company_name,
-              monthly_value: value,
-              created_at: cp.client.created_at
+              id: cp.id,
+              company_name: cp.company_name,
+              monthly_value: totalValue,
+              created_at: cp.created_at
             })
           }
           return acc
