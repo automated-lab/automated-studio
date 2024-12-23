@@ -1,4 +1,4 @@
-import { Flame, CloudLightning, Cloud, CloudOff } from 'lucide-react'
+import { Flame, CloudLightning, Cloud, CloudOff, AlertCircle, Medal, ThumbsDown } from 'lucide-react'
 
 export const getReviewPotential = (rating?: number, totalRatings?: number) => {
     if (rating == null || totalRatings == null) return null

@@ -13,8 +13,10 @@ import { SearchResultsList } from "@/components/prospects/search-results-list"
 import { useProspectStore, LocationType } from "@/src/store/useProspectStore"
 import { useContext } from 'react'
 import { DashboardContext } from '@/contexts/DashboardContext'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { getReviewPotential } from "@/lib/review-potential"
+import { RecentSearches } from "@/components/prospects/recent-searches"
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 const libraries: Libraries = ['places'] as const
 const mapNode = typeof document !== 'undefined' ? document.createElement('div') : null
@@ -85,6 +87,7 @@ export default function ProspectingInterface() {
   const [selectedBusinessId, setSelectedBusinessId] = React.useState<number>()
   const [shouldPanTo, setShouldPanTo] = React.useState(false)
   const [preparedLocation, setPreparedLocation] = React.useState<{ lat: number; lng: number } | null>(null)
+  const [refreshSearches, setRefreshSearches] = useState(0)
 
   const placesAutocomplete = usePlacesAutocomplete({
     requestOptions: { 
@@ -123,6 +126,25 @@ export default function ProspectingInterface() {
     }
   }
 
+  interface RecentSearch {
+    id: string
+    search_query: string
+    search_location: string
+    search_radius: number
+    created_at: string
+    prospect_results: {
+      place_id: string
+      business_name: string
+      formatted_address: string
+      rating: number
+      total_ratings: number
+      location: {
+        lat: number
+        lng: number
+      }
+    }[]
+  }
+
   // Event handlers
   const handleSearch = React.useCallback(() => {
     if (!isLoaded || !searchQuery || typeof google === 'undefined') return
@@ -138,7 +160,7 @@ export default function ProspectingInterface() {
       location: new google.maps.LatLng(locationForSearch.lat, locationForSearch.lng),
     }
 
-    service.textSearch(request, (results, status) => {
+    service.textSearch(request, async (results, status) => {
       if (status === google.maps.places.PlacesServiceStatus.OK && results) {
         const filteredResults = results.filter(place => {
           if (!place.geometry?.location) return false
@@ -162,12 +184,38 @@ export default function ProspectingInterface() {
           }
         })) as CustomPlaceResult[]
 
+        // Save search via API route
+        try {
+          await fetch('/api/prospects/searches', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              searchQuery,
+              searchLocation: storedLocation,
+              searchRadius: 5,
+              results: convertedResults.map(result => ({
+                name: result.name,
+                place_id: result.place_id,
+                formatted_address: result.formatted_address,
+                rating: result.rating,
+                user_ratings_total: result.user_ratings_total,
+                location: getLatLngValue(result.geometry.location)
+              }))
+            })
+          })
+        } catch (error) {
+          console.error('Error saving search:', error)
+        }
+
         setSearchResults(convertedResults)
         setLocation({ 
           lat: locationForSearch.lat, 
           lng: locationForSearch.lng 
         })
         setPreparedLocation(null)
+        setRefreshSearches(prev => prev + 1)
       }
     })
   }, [isLoaded, searchQuery, preparedLocation, location, setLocation, setSearchResults])
@@ -190,6 +238,27 @@ export default function ProspectingInterface() {
     setSearchQuery('')
     setLocationSearch('')
     setSearchResults([])
+  }
+
+  const handleSearchSelect = (search: RecentSearch) => {
+    setSearchQuery(search.search_query)
+    setLocationSearch(search.search_location)
+    
+    const transformedResults = search.prospect_results.map(result => ({
+      name: result.business_name,
+      place_id: result.place_id,
+      formatted_address: result.formatted_address,
+      rating: result.rating,
+      user_ratings_total: result.total_ratings,
+      geometry: {
+        location: new google.maps.LatLng(
+          result.location.lat,
+          result.location.lng
+        )
+      }
+    })) as CustomPlaceResult[]
+    
+    setSearchResults(transformedResults)
   }
 
   const handleBusinessClick = (index: number) => {
@@ -314,6 +383,11 @@ export default function ProspectingInterface() {
                 </div>
               </div>
             </form>
+            
+            <RecentSearches 
+              onSearchSelect={handleSearchSelect} 
+              refreshTrigger={refreshSearches}
+            />
           </div>
 
           <div className="flex-1 overflow-auto p-6 pt-4">

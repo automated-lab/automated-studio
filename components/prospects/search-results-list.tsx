@@ -8,6 +8,12 @@ import { MapPin } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { getReviewPotential } from "@/lib/review-potential" // We'll create this next
 import { CustomPlaceResult } from '@/src/store/useProspectStore'  // Add this import
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
+import { Product } from "@/types"
 
 interface SearchResultsListProps {
   searchResults: CustomPlaceResult[]  // Changed from PlaceResult[]
@@ -86,4 +92,99 @@ export function SearchResultsList({ searchResults, onBusinessClick }: SearchResu
       ))}
     </div>
   )
+} 
+
+interface ConvertToLeadDialogProps {
+  place: any;
+  onConfirm: (data: any) => Promise<void>;
+  onCancel: () => void;
+}
+
+function ConvertToLeadDialog({ place, onConfirm, onCancel }: ConvertToLeadDialogProps) {
+  const [products, setProducts] = useState<Product[]>([])
+  const [selectedProducts, setSelectedProducts] = useState<{[key: string]: string}>({})
+  
+  useEffect(() => {
+    // Fetch available products
+    fetch('/api/products')
+      .then(res => res.json())
+      .then(setProducts)
+  }, [])
+
+  return (
+    <Dialog>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Convert {place.name} to Lead</DialogTitle>
+          <DialogDescription>
+            Select products this lead might be interested in
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="space-y-4 py-4">
+          {products.map(product => (
+            <div key={product.id} className="flex items-center space-x-2">
+              <Select
+                value={selectedProducts[product.id] || ''}
+                onValueChange={(value) => setSelectedProducts(prev => ({
+                  ...prev,
+                  [product.id]: value
+                }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={`Interest in ${product.name}`} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="INTERESTED">Interested</SelectItem>
+                  <SelectItem value="MAYBE">Maybe</SelectItem>
+                  <SelectItem value="NOT_INTERESTED">Not Interested</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          ))}
+          
+          <Textarea 
+            placeholder="Additional notes..."
+            className="mt-4"
+          />
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onCancel}>Cancel</Button>
+          <Button onClick={() => onConfirm({
+            place,
+            productInterests: selectedProducts
+          })}>
+            Create Lead
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+async function handleConvertToLead(data: any) {
+  try {
+    // First create the lead
+    const leadResponse = await fetch('/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        business_name: data.place.name,
+        source: 'PROSPECTING',
+        place_id: data.place.place_id,
+        address: data.place.formatted_address,
+        website: data.place.website,
+        phone: data.place.formatted_phone_number,
+        status: 'NEW',
+        productInterests: data.productInterests // Will be handled in API
+      })
+    })
+    
+    if (!leadResponse.ok) throw new Error('Failed to create lead')
+    toast.success('Lead created successfully')
+  } catch (error) {
+    toast.error('Failed to create lead')
+    console.error(error)
+  }
 } 

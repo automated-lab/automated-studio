@@ -8,6 +8,7 @@ export type LocationType = google.maps.LatLng | {
 
 export interface CustomPlaceResult {
   name?: string;
+  place_id?: string;
   formatted_address?: string;
   rating?: number;
   user_ratings_total?: number;
