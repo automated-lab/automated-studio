@@ -81,7 +81,7 @@ export function RecentSearches({
 
   return (
     <div className="mt-4">
-      <div className="text-muted-foreground flex items-center gap-1.5 mb-2">
+      <div className="text-muted-foreground flex items-center gap-1.5 mb-2 text-sm">
         <History className="h-3.5 w-3.5" />
         Recent:
       </div>
