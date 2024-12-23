@@ -324,6 +324,8 @@ export default function ProspectingInterface() {
         rating: result.rating,
         totalRatings: result.user_ratings_total,
         location: result.geometry?.location ? getLatLngValue(result.geometry.location) : { lat: 0, lng: 0 },
+        phone: result.formatted_phone_number,
+        website: result.website,
         reviewPotential: getReviewPotential(result.rating, result.user_ratings_total)
       })),
       totalResults: searchResults.length,
