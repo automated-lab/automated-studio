@@ -21,15 +21,37 @@ interface SearchResultsListProps {
 
 export function SearchResultsList({ searchResults, onBusinessClick }: SearchResultsListProps) {
   const [chatbotStatus, setChatbotStatus] = useState<Record<string, boolean | null>>({})
+  const [isLoading, setIsLoading] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     searchResults.forEach(async (place) => {
       if (place.website && !chatbotStatus[place.place_id]) {
-        const hasChatbot = await detectChatbot(place.website)
-        setChatbotStatus(prev => ({
-          ...prev,
-          [place.place_id]: hasChatbot
-        }))
+        setIsLoading(prev => ({ ...prev, [place.place_id]: true }))
+        
+        try {
+          // Add timeout to the fetch
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Timeout')), 10000)
+          })
+          
+          const result = await Promise.race([
+            detectChatbot(place.website),
+            timeoutPromise
+          ])
+
+          setChatbotStatus(prev => ({
+            ...prev,
+            [place.place_id]: result
+          }))
+        } catch (error) {
+          console.error('Chatbot detection failed:', error)
+          setChatbotStatus(prev => ({
+            ...prev,
+            [place.place_id]: null
+          }))
+        } finally {
+          setIsLoading(prev => ({ ...prev, [place.place_id]: false }))
+        }
       }
     })
   }, [searchResults])
@@ -96,19 +118,23 @@ export function SearchResultsList({ searchResults, onBusinessClick }: SearchResu
                     
                     <div className="flex items-center p-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors h-[34px] min-w-fit">
                       <Bot className={`h-4 w-4 ${
-                        chatbotStatus[place.place_id] === null 
-                          ? 'text-gray-400' 
-                          : chatbotStatus[place.place_id] 
-                            ? 'text-gray-400'  // Has chatbot = less opportunity
-                            : 'text-green-500' // No chatbot = sales opportunity!
+                        isLoading[place.place_id]
+                          ? 'text-gray-400'
+                          : chatbotStatus[place.place_id] === null 
+                            ? 'text-gray-400' 
+                            : chatbotStatus[place.place_id] 
+                              ? 'text-gray-400'
+                              : 'text-green-500'
                       }`} />
                       <div className="ml-2 pl-2 border-l border-gray-200 h-4 flex items-center">
                         <span className="text-sm">
-                          {chatbotStatus[place.place_id] === null 
-                            ? 'Checking...' 
-                            : chatbotStatus[place.place_id] 
-                              ? 'Chatbot Detected' 
-                              : 'No Chatbot Detected'}
+                          {isLoading[place.place_id]
+                            ? 'Checking...'
+                            : chatbotStatus[place.place_id] === null 
+                              ? 'Check Failed' 
+                              : chatbotStatus[place.place_id] 
+                                ? 'Has Chatbot' 
+                                : 'No Chatbot'}
                         </span>
                       </div>
                     </div>
