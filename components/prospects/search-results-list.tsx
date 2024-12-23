@@ -133,8 +133,8 @@ export function SearchResultsList({ searchResults, onBusinessClick }: SearchResu
                             : chatbotStatus[place.place_id] === null 
                               ? 'Check Failed' 
                               : chatbotStatus[place.place_id] 
-                                ? 'Has Chatbot' 
-                                : 'No Chatbot'}
+                                ? 'Chatbot Detected' 
+                                : 'No Chatbot Detected'}
                         </span>
                       </div>
                     </div>
