@@ -26,7 +26,16 @@ export async function POST(req: Request) {
       // Check for incompatible platforms first
       const incompatiblePlatforms = {
         webflow: ['webflow.com', 'webflow.io'],
-        wix: ['wix.com', 'wixsite.com', '_wix_'],
+        wix: [
+          'wix.com', 
+          'wixsite.com', 
+          '_wix_',
+          'x-wix-',
+          'wix-dropdown',
+          'wix-image',
+          '<meta name="generator" content="Wix.com Website Builder"',
+          'new.wix.com'
+        ],
         squarespace: ['squarespace.com', 'sqsp.net'],
         shopify: ['shopify.com', '.myshopify.com'],
         duda: ['duda.co', 'dudaone.com', '<meta name="generator" content="Duda"'],
