@@ -8,9 +8,8 @@ export async function POST(req: Request) {
       return new Response('URL required', { status: 400 })
     }
 
-    // Add timeout and error handling
     const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 5000) // 5s timeout
+    const timeout = setTimeout(() => controller.abort(), 5000)
 
     try {
       const response = await fetch(url, {
@@ -22,35 +21,31 @@ export async function POST(req: Request) {
       })
 
       clearTimeout(timeout)
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
       const html = await response.text()
       
-      // More comprehensive detection
-      const chatbotSignatures = [
-        'intercom',
-        'drift',
-        'zendesk',
-        'livechat',
-        'tawk.to',
-        'crisp',
-        'freshchat',
-        'hubspot',
-        'messenger',
-        'chatbot',
-        'live-chat',
-        'live_chat'
-      ]
+      // More specific signatures
+      const chatbotSignatures = {
+        intercom: ['intercomcdn', 'intercom-container'],
+        drift: ['drift.com', 'drift-widget'],
+        zendesk: ['zdassets.com', 'zopim'],
+        tawk: ['tawk.to', 'embed.tawk.to'],
+        crisp: ['crisp.chat', 'crisp-client'],
+        freshchat: ['wchat.freshchat.com'],
+        hubspot: ['hubspot-messages-iframe'],
+        messenger: ['messenger-checkbox', 'fb-messenger'],
+      }
       
-      const hasChatbot = chatbotSignatures.some(signature => 
-        html.toLowerCase().includes(signature)
-      )
+      // Check for specific matches and log what we find
+      const found = []
+      for (const [provider, signatures] of Object.entries(chatbotSignatures)) {
+        if (signatures.some(sig => html.toLowerCase().includes(sig))) {
+          found.push(provider)
+        }
+      }
       
       return Response.json({ 
-        hasChatbot,
+        hasChatbot: found.length > 0,
+        detected: found,
         status: 'success'
       })
 
