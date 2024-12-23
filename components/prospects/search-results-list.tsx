@@ -127,7 +127,7 @@ export function SearchResultsList({ searchResults, onBusinessClick }: SearchResu
                               : 'text-green-500'
                       }`} />
                       <div className="ml-2 pl-2 border-l border-gray-200 h-4 flex items-center">
-                        <span className="text-sm">
+                        <span className="text-xs">
                           {isLoading[place.place_id]
                             ? 'Checking...'
                             : chatbotStatus[place.place_id] === null 
