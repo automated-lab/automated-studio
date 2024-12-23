@@ -1,10 +1,9 @@
 'use client'
 
 import * as React from "react"
-import { Star, ArrowRight } from 'lucide-react'
+import { Star, ArrowRight, MapPin, Phone, Globe } from 'lucide-react'
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { MapPin } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { getReviewPotential } from "@/lib/review-potential" // We'll create this next
 import { CustomPlaceResult } from '@/src/store/useProspectStore'  // Add this import
@@ -37,6 +36,26 @@ export function SearchResultsList({ searchResults, onBusinessClick }: SearchResu
                   <MapPin className="h-4 w-4 mr-1" />
                   {place.formatted_address}
                 </div>
+                {place.formatted_phone_number && (
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <Phone className="h-4 w-4 mr-1" />
+                    {place.formatted_phone_number}
+                  </div>
+                )}
+                {place.website && (
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <Globe className="h-4 w-4 mr-1" />
+                    <a 
+                      href={place.website} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="hover:underline"
+                    >
+                      {place.website}
+                    </a>
+                  </div>
+                )}
                 {place.rating && (
                   <TooltipProvider>
                     <Tooltip>

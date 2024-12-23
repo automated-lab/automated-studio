@@ -25,6 +25,8 @@ export async function GET() {
         formatted_address,
         rating,
         total_ratings,
+        formatted_phone_number,
+        website,
         location
       )
     `)
@@ -76,6 +78,8 @@ export async function POST(req: Request) {
           formatted_address: result.formatted_address,
           rating: result.rating,
           total_ratings: result.user_ratings_total,
+          formatted_phone_number: result.formatted_phone_number,
+          website: result.website,
           location: result.location
         }))
       )

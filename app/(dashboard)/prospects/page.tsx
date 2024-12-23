@@ -145,6 +145,20 @@ export default function ProspectingInterface() {
     }[]
   }
 
+  interface RecentSearchResult {
+    place_id: string;
+    business_name: string;
+    formatted_address: string;
+    rating: number;
+    total_ratings: number;
+    formatted_phone_number: string;
+    website: string;
+    location: {
+      lat: number;
+      lng: number;
+    };
+  }
+
   // Event handlers
   const handleSearch = React.useCallback(() => {
     if (!isLoaded || !searchQuery || typeof google === 'undefined') return
@@ -174,13 +188,25 @@ export default function ProspectingInterface() {
           return distance <= 5
         })
         
-        const convertedResults = filteredResults.map(place => ({
-          ...place,
-          geometry: {
-            location: new google.maps.LatLng(
-              place.geometry!.location!.lat(),
-              place.geometry!.location!.lng()
+        const convertedResults = await Promise.all(filteredResults.map(async place => {
+          // Get additional details including phone number and website
+          const details = await new Promise<google.maps.places.PlaceResult>((resolve) => {
+            service.getDetails(
+              { placeId: place.place_id!, fields: ['formatted_phone_number', 'website'] },
+              (result) => resolve(result || place)
             )
+          })
+
+          return {
+            ...place,
+            formatted_phone_number: details.formatted_phone_number,
+            website: details.website,
+            geometry: {
+              location: new google.maps.LatLng(
+                place.geometry!.location!.lat(),
+                place.geometry!.location!.lng()
+              )
+            }
           }
         })) as CustomPlaceResult[]
 
@@ -201,6 +227,8 @@ export default function ProspectingInterface() {
                 formatted_address: result.formatted_address,
                 rating: result.rating,
                 user_ratings_total: result.user_ratings_total,
+                formatted_phone_number: result.formatted_phone_number,
+                website: result.website,
                 location: getLatLngValue(result.geometry.location)
               }))
             })
@@ -241,15 +269,14 @@ export default function ProspectingInterface() {
   }
 
   const handleSearchSelect = (search: RecentSearch) => {
-    setSearchQuery(search.search_query)
-    setLocationSearch(search.search_location)
-    
-    const transformedResults = search.prospect_results.map(result => ({
+    const transformedResults = search.prospect_results.map((result: RecentSearchResult) => ({
       name: result.business_name,
       place_id: result.place_id,
       formatted_address: result.formatted_address,
       rating: result.rating,
       user_ratings_total: result.total_ratings,
+      formatted_phone_number: result.formatted_phone_number,
+      website: result.website,
       geometry: {
         location: new google.maps.LatLng(
           result.location.lat,

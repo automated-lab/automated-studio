@@ -12,6 +12,8 @@ export interface CustomPlaceResult {
   formatted_address?: string;
   rating?: number;
   user_ratings_total?: number;
+  formatted_phone_number?: string;
+  website?: string;
   geometry?: {
     location: {
       lat: () => number;

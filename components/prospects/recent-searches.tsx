@@ -18,6 +18,8 @@ interface RecentSearch {
     formatted_address: string
     rating: number
     total_ratings: number
+    formatted_phone_number: string
+    website: string
     location: {
       lat: number
       lng: number
@@ -31,6 +33,8 @@ interface DatabasePlaceResult {
   formatted_address: string;
   rating: number;
   total_ratings: number;
+  formatted_phone_number: string;
+  website: string;
   location: {
     lat: number;
     lng: number;
@@ -64,6 +68,8 @@ export function RecentSearches({
       formatted_address: result.formatted_address,
       rating: result.rating,
       total_ratings: result.total_ratings,
+      formatted_phone_number: result.formatted_phone_number,
+      website: result.website,
       location: result.location
     }))
 
