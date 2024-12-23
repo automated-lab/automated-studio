@@ -1,20 +1,22 @@
 'use client'
 
 import { useState } from 'react'
-import { User, Product } from '@/types/database'
+import { User, Product, Bot } from '@/types/database'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Users, Package, Settings, Search } from 'lucide-react'
 import { UsersTab } from '@/components/admin/AdminUsersTab'
 import { ProductsTab } from './ProductsTab'
+import { BotsTab } from './BotsTab'
 
 interface AdminPortalProps {
   users: User[]
   products: Product[]
+  bots: Bot[]
 }
 
-export default function AdminPortal({ users, products }: AdminPortalProps) {
+export default function AdminPortal({ users, products, bots }: AdminPortalProps) {
   const [activeTab, setActiveTab] = useState("users")
 
   return (
@@ -40,6 +42,7 @@ export default function AdminPortal({ users, products }: AdminPortalProps) {
             <TabsList>
               <TabsTrigger value="users">Users</TabsTrigger>
               <TabsTrigger value="products">Products</TabsTrigger>
+              <TabsTrigger value="bots">Bots</TabsTrigger>
               <TabsTrigger value="settings">Settings</TabsTrigger>
             </TabsList>
 
@@ -49,6 +52,10 @@ export default function AdminPortal({ users, products }: AdminPortalProps) {
 
             <TabsContent value="products">
               <ProductsTab initialProducts={products} />
+            </TabsContent>
+
+            <TabsContent value="bots">
+              <BotsTab initialBots={bots} />
             </TabsContent>
 
             <TabsContent value="settings">

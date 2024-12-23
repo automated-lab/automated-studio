@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from "react"
-import { Star, ArrowRight, MapPin, Phone, Globe, SearchCheck, Bot } from 'lucide-react'
+import { Star, ArrowRight, MapPin, Phone, Globe, SearchCheck, Bot, BotOff } from 'lucide-react'
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
@@ -10,44 +10,92 @@ import { CustomPlaceResult } from '@/src/store/useProspectStore'  // Add this im
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef, useMemo } from "react"
 import { toast } from "sonner"
 import { Product } from "@/types"
+import type { Database } from '@/types/database'
+type BotType = Database['public']['Tables']['bots']['Row']
 
 interface SearchResultsListProps {
   searchResults: CustomPlaceResult[]
   onBusinessClick: (index: number) => void
 }
 
+interface ChatbotStatus {
+  hasChatbot: boolean | null;
+  status: string;
+  platform?: string;
+}
+
+const platformDisplayNames = {
+  webflow: 'Webflow',
+  wix: 'Wix',
+  squarespace: 'Squarespace',
+  shopify: 'Shopify',
+  duda: 'Duda',
+  wordpress: 'WordPress',
+  weebly: 'Weebly'
+} as const
+
 export function SearchResultsList({ searchResults, onBusinessClick }: SearchResultsListProps) {
-  const [chatbotStatus, setChatbotStatus] = useState<Record<string, boolean | null>>({})
+  const [chatbotStatus, setChatbotStatus] = useState<Record<string, ChatbotStatus>>({})
   const [isLoading, setIsLoading] = useState<Record<string, boolean>>({})
+  const [showBotDialog, setShowBotDialog] = useState(false)
+  const [selectedPlace, setSelectedPlace] = useState<CustomPlaceResult | null>(null)
+  const [selectedBotType, setSelectedBotType] = useState<string>('')
+  const [demoUrl, setDemoUrl] = useState<string | null>(null)
+  const isGenerating = useRef(false)
+  const toastShown = useRef(false)
+  const [botTemplates, setBotTemplates] = useState<BotType[]>([])
 
   useEffect(() => {
+    async function fetchBots() {
+      const res = await fetch('/api/bot-templates')
+      const data = await res.json()
+      if (Array.isArray(data)) {
+        setBotTemplates(data)
+      }
+    }
+    fetchBots()
+  }, [])
+
+  useEffect(() => {
+    const checkedUrls = new Set()
+    
     searchResults.forEach(async (place) => {
-      if (place.website && !chatbotStatus[place.place_id]) {
+      if (place.website && !chatbotStatus[place.place_id] && !checkedUrls.has(place.website)) {
+        checkedUrls.add(place.website)
         setIsLoading(prev => ({ ...prev, [place.place_id]: true }))
         
         try {
-          // Add timeout to the fetch
-          const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('Timeout')), 10000)
+          console.log('Checking website:', place.website)
+          const response = await fetch('/api/check-chatbot', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ url: place.website })
           })
+          const data = await response.json()
           
-          const result = await Promise.race([
-            detectChatbot(place.website),
-            timeoutPromise
-          ])
-
           setChatbotStatus(prev => ({
             ...prev,
-            [place.place_id]: result
+            [place.place_id]: {
+              hasChatbot: data.hasChatbot,
+              status: data.status || 'success',
+              platform: data.platform,
+              compatible: data.compatible
+            }
           }))
         } catch (error) {
           console.error('Chatbot detection failed:', error)
           setChatbotStatus(prev => ({
             ...prev,
-            [place.place_id]: null
+            [place.place_id]: {
+              hasChatbot: null,
+              status: 'error',
+              compatible: false
+            }
           }))
         } finally {
           setIsLoading(prev => ({ ...prev, [place.place_id]: false }))
@@ -77,69 +125,90 @@ export function SearchResultsList({ searchResults, onBusinessClick }: SearchResu
                     {place.formatted_phone_number}
                   </div>
                 )}
-                {place.rating && (
-                  <div className="flex items-center gap-2">
-                    <a 
-                      href={`https://www.google.com/maps/place/?q=place_id:${place.place_id}`}
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="flex items-center p-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors h-[34px] min-w-fit"
-                    >
-                      <GoogleGLogo />
-                      <div className="ml-2 pl-2 border-l border-gray-200 h-4 flex items-center">
-                        <span className="text-xs">GMB Profile</span>
-                      </div>
-                    </a>
-
-                    <div className="flex items-center p-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors h-[34px] min-w-fit">
-                      {place.website ? (
-                        <a 
-                          href={place.website} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className="flex items-center"
-                        >
-                          <Globe className="h-4 w-4 text-blue-500" />
-                          <div className="ml-2 pl-2 border-l border-gray-200 h-4 flex items-center">
-                            <span className="text-xs">Website</span>
-                          </div>
-                        </a>
-                      ) : (
-                        <div className="flex items-center">
-                          <Globe className="h-4 w-4 text-gray-400" />
-                          <div className="ml-2 pl-2 border-l border-gray-200 h-4 flex items-center">
-                            <span className="text-xs text-gray-400">No Website</span>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="flex items-center p-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors h-[34px] min-w-fit">
-                      <Bot className={`h-4 w-4 ${
-                        isLoading[place.place_id]
-                          ? 'text-gray-400'
-                          : chatbotStatus[place.place_id] === null 
-                            ? 'text-gray-400' 
-                            : chatbotStatus[place.place_id] 
-                              ? 'text-gray-400'
-                              : 'text-green-500'
-                      }`} />
-                      <div className="ml-2 pl-2 border-l border-gray-200 h-4 flex items-center">
-                        <span className="text-xs">
-                          {isLoading[place.place_id]
-                            ? 'Checking...'
-                            : chatbotStatus[place.place_id] === null 
-                              ? 'Check Failed' 
-                              : chatbotStatus[place.place_id] 
-                                ? 'Chatbot Detected' 
-                                : 'No Chatbot Detected'}
+                <div className="flex items-center space-x-2 mt-2">
+                  {place.website && (
+                    <>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <a 
+                              href={place.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="flex items-center p-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                            >
+                              <GoogleGLogo />
+                              <span className="ml-2 pl-2 border-l border-gray-200 h-4 flex items-center">
+                                <span className="text-xs">GMB Profile</span>
+                              </span>
+                            </a>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>View Google My Business Profile</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      <a 
+                        href={place.website} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center p-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors h-[34px] min-w-fit"
+                      >
+                        <Globe className="h-4 w-4 text-blue-500" />
+                        <span className="ml-2 pl-2 border-l border-gray-200 h-4 flex items-center">
+                          <span className="text-xs">Website</span>
                         </span>
+                      </a>
+
+                      <div 
+                        className="flex items-center p-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors h-[34px] min-w-fit cursor-pointer"
+                        onClick={() => {
+                          console.log('Clicked!', {
+                            status: chatbotStatus[place.place_id],
+                            hasChatbot: chatbotStatus[place.place_id]?.hasChatbot,
+                            isIncompatible: chatbotStatus[place.place_id]?.status === 'incompatible'
+                          })
+                          
+                          if (!chatbotStatus[place.place_id]?.hasChatbot && chatbotStatus[place.place_id]?.status !== 'incompatible') {
+                            setSelectedPlace(place)
+                            setShowBotDialog(true)
+                          }
+                        }}
+                        
+                      >
+                        {chatbotStatus[place.place_id]?.status === 'incompatible' 
+                          ? (
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <BotOff className="h-4 w-4 text-orange-500" />                              
+                              <TooltipContent>
+                                <p>{platformDisplayNames[chatbotStatus[place.place_id].platform as keyof typeof platformDisplayNames]} is not compatible with the showcase tool</p>
+                              </TooltipContent>
+                              </TooltipTrigger>
+                            </Tooltip>
+                          )
+                          : <Bot className={`h-4 w-4 ${
+                              isLoading[place.place_id]
+                                ? 'text-gray-400'
+                                : chatbotStatus[place.place_id]?.hasChatbot
+                                  ? 'text-gray-400'
+                                  : 'text-green-500'
+                            }`} />
+                        }
+                        <div className="ml-2 pl-2 border-l border-gray-200 h-4 flex items-center">
+                          <span className="text-xs">
+                            {isLoading[place.place_id]
+                              ? 'Checking...'
+                              : chatbotStatus[place.place_id]?.status === 'incompatible'
+                                ? `${platformDisplayNames[chatbotStatus[place.place_id].platform as keyof typeof platformDisplayNames]}`
+                                : chatbotStatus[place.place_id]?.hasChatbot
+                                  ? 'Chatbot Detected'
+                                  : 'No Chatbot Detected'}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    
-                    <TooltipProvider>
+                    </>
+                  )}
+
+                  {place.rating && (
                       <Tooltip>
                         <TooltipTrigger>
                           <div className="flex items-center p-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
@@ -173,10 +242,10 @@ export function SearchResultsList({ searchResults, onBusinessClick }: SearchResu
                           </div>
                         </TooltipContent>
                       </Tooltip>
-                    </TooltipProvider>
-                    
-                  </div>
-                )}
+                  )}
+
+                </div>
+                
               </div>
               <Button
                 size="sm"
@@ -193,6 +262,89 @@ export function SearchResultsList({ searchResults, onBusinessClick }: SearchResu
           </CardContent>
         </Card>
       ))}
+      <Dialog open={showBotDialog} onOpenChange={setShowBotDialog}>
+        <DialogContent className="space-y-6">
+          <DialogHeader>
+            <DialogTitle>Add Chatbot Demo</DialogTitle>
+            <DialogDescription>
+              Create a demo chatbot for {selectedPlace?.name}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-8">
+            <div className="flex items-center space-x-2">
+              <Select
+                value={selectedBotType}
+                onValueChange={setSelectedBotType}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a bot template" />
+                </SelectTrigger>
+                <SelectContent>
+                  {botTemplates.map((template: BotType) => (
+                    <SelectItem key={template.id} value={template.id}>
+                      <div className="flex items-center justify-between w-full">
+                        <span>{template.name}</span>
+                        <span className="text-xs text-muted-foreground ml-2">({template.description})</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setShowBotDialog(false)}>Cancel</Button>
+              <Button 
+                onClick={(e) => {
+                  e.preventDefault()
+                  
+                  if (isGenerating.current) return
+                  isGenerating.current = true
+
+                  requestAnimationFrame(() => {
+                    const websiteUrl = selectedPlace?.website?.replace('http://', 'https://') || ''
+                    const newDemoUrl = `https://botsonyour.site/showcase.html?url=${encodeURIComponent(websiteUrl)}&botId=${selectedBotType}`
+                    
+                    setDemoUrl(newDemoUrl)
+                    
+                    if (!toastShown.current) {
+                      toast.success('Demo generated successfully!', {
+                        description: 'Click the link below to view your demo',
+                        id: 'demo-generated'
+                      })
+                      toastShown.current = true
+                    }
+
+                    setTimeout(() => {
+                      isGenerating.current = false
+                      toastShown.current = false
+                    }, 1000)
+                  })
+                }}
+                disabled={!selectedBotType || isGenerating.current}
+              >
+                Generate Demo
+              </Button>
+            </div>
+
+            {demoUrl && (
+              <div className="pt-2 flex justify-center">
+                <a 
+                  href={demoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-full hover:bg-blue-100 transition-colors"
+                >
+                  <Bot className="w-4 h-4 mr-2" />
+                  View Live Demo
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </a>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 } 

@@ -192,7 +192,7 @@ export default function ProspectingInterface() {
           // Get additional details including phone number and website
           const details = await new Promise<google.maps.places.PlaceResult>((resolve) => {
             service.getDetails(
-              { placeId: place.place_id!, fields: ['formatted_phone_number', 'website'] },
+              { placeId: place.place_id!, fields: ['formatted_phone_number', 'website', 'url'] },
               (result) => resolve(result || place)
             )
           })
@@ -201,6 +201,7 @@ export default function ProspectingInterface() {
             ...place,
             formatted_phone_number: details.formatted_phone_number,
             website: details.website,
+            url: details.url,
             geometry: {
               location: new google.maps.LatLng(
                 place.geometry!.location!.lat(),

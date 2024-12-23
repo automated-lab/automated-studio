@@ -98,6 +98,11 @@ export interface Database {
         Insert: Omit<Client, 'id' | 'created_at' | 'updated_at'>
         Update: Partial<Omit<Client, 'id' | 'created_at' | 'updated_at'>>
       }
+      bots: {
+        Row: Bot
+        Insert: Omit<Bot, 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<Omit<Bot, 'id' | 'created_at' | 'updated_at'>>
+      }
     }
   }
 } 
@@ -126,4 +131,12 @@ export interface ClientProduct {
   created_at: string
   updated_at: string
   product?: Product // For joined queries
+} 
+
+export interface Bot {
+  id: string
+  name: string
+  description: string
+  created_at: string
+  updated_at: string
 } 

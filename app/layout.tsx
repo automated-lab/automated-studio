@@ -13,6 +13,7 @@ import { Metadata } from "next";
 import { Toaster } from "sonner"
 import { CopilotKit } from "@copilotkit/react-core";
 import "@copilotkit/react-ui/styles.css";
+import { TooltipProvider } from "@/components/ui/tooltip"
 
 
 const font = Inter({ subsets: ["latin"] });
@@ -46,15 +47,17 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           enableSystem
           disableTransitionOnChange
         >
-          <NextTopLoader 
-            color="#287150"
-            height={2}
-            showSpinner={false}
-          />
-          <ClientLayout>{children}</ClientLayout>
-          <Toaster />
-          <SpeedInsights />
-          <Analytics />
+          <TooltipProvider>
+            <NextTopLoader 
+              color="#287150"
+              height={2}
+              showSpinner={false}
+            />
+            <ClientLayout>{children}</ClientLayout>
+            <Toaster />
+            <SpeedInsights />
+            <Analytics />
+          </TooltipProvider>
         </ThemeProvider>
         </CopilotKit>
       </body>

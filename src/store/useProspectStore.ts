@@ -14,6 +14,8 @@ export interface CustomPlaceResult {
   user_ratings_total?: number;
   formatted_phone_number?: string;
   website?: string;
+  maps_url?: string;
+  url?: string;
   geometry?: {
     location: {
       lat: () => number;

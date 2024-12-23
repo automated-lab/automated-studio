@@ -35,5 +35,10 @@ export default async function AdminPage() {
     .from('products')
     .select('*')
 
-  return <AdminPortal users={users || []} products={products || []} />
+  // Add bots fetch
+  const { data: bots } = await supabase
+    .from('bots')
+    .select('*')
+
+  return <AdminPortal users={users || []} products={products || []} bots={bots || []} />
 }
