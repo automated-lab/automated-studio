@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from "react"
-import { Star, ArrowRight, MapPin, Phone, Globe, SearchCheck } from 'lucide-react'
+import { Star, ArrowRight, MapPin, Phone, Globe, SearchCheck, Bot } from 'lucide-react'
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
@@ -20,6 +20,20 @@ interface SearchResultsListProps {
 }
 
 export function SearchResultsList({ searchResults, onBusinessClick }: SearchResultsListProps) {
+  const [chatbotStatus, setChatbotStatus] = useState<Record<string, boolean | null>>({})
+
+  useEffect(() => {
+    searchResults.forEach(async (place) => {
+      if (place.website && !chatbotStatus[place.place_id]) {
+        const hasChatbot = await detectChatbot(place.website)
+        setChatbotStatus(prev => ({
+          ...prev,
+          [place.place_id]: hasChatbot
+        }))
+      }
+    })
+  }, [searchResults])
+
   return (
     <div className="space-y-4">
       {searchResults.map((place, index) => (
@@ -80,6 +94,25 @@ export function SearchResultsList({ searchResults, onBusinessClick }: SearchResu
                       )}
                     </div>
                     
+                    <div className="flex items-center p-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors h-[34px] min-w-fit">
+                      <Bot className={`h-4 w-4 ${
+                        chatbotStatus[place.place_id] === null 
+                          ? 'text-gray-400' 
+                          : chatbotStatus[place.place_id] 
+                            ? 'text-gray-400'  // Has chatbot = less opportunity
+                            : 'text-green-500' // No chatbot = sales opportunity!
+                      }`} />
+                      <div className="ml-2 pl-2 border-l border-gray-200 h-4 flex items-center">
+                        <span className="text-sm">
+                          {chatbotStatus[place.place_id] === null 
+                            ? 'Checking...' 
+                            : chatbotStatus[place.place_id] 
+                              ? 'Chatbot Detected' 
+                              : 'No Chatbot Detected'}
+                        </span>
+                      </div>
+                    </div>
+                    
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger>
@@ -115,6 +148,7 @@ export function SearchResultsList({ searchResults, onBusinessClick }: SearchResu
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
+                    
                   </div>
                 )}
               </div>
@@ -240,3 +274,17 @@ const GoogleGLogo = () => (
     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
   </svg>
 ) 
+
+const detectChatbot = async (url: string) => {
+  try {
+    const response = await fetch('/api/check-chatbot', {
+      method: 'POST',
+      body: JSON.stringify({ url })
+    })
+    const data = await response.json()
+    return data.hasChatbot
+  } catch (error) {
+    console.error('Chatbot detection failed:', error)
+    return null
+  }
+} 
