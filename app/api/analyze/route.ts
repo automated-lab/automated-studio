@@ -2,6 +2,7 @@ export const runtime = 'nodejs'
 
 import { NextResponse } from 'next/server';
 import { analyzeWebsite } from '@/services/analysis/website';
+import fetch from 'node-fetch';
 
 export async function POST(req: Request) {
   try {
@@ -14,17 +15,30 @@ export async function POST(req: Request) {
       );
     }
 
-    // Get basic analysis
-    const techData = await analyzeWebsite(url);
+    // Add error handling for the URL
+    const techData = await analyzeWebsite(url).catch(error => {
+      console.error('Website analysis failed:', error);
+      return {
+        technologies: [],
+        seoScore: 0,
+        socialProfiles: [],
+        security: { ssl: false },
+        analytics: { hasAnalytics: false, provider: 'None' }
+      };
+    });
     
-    // Get performance data from PageSpeed API
-    const pagespeedResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/lighthouse`, {
+    // Get performance data from PageSpeed API with error handling
+    const pagespeedResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/lighthouse`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url })
-    });
+    }).catch(() => null);
     
-    const lighthouseData = await pagespeedResponse.json();
+    const lighthouseData = pagespeedResponse ? await pagespeedResponse.json() : {
+      performance: { score: 0 },
+      accessibility: { score: 0 },
+      seo: { score: 0 }
+    };
     
     return NextResponse.json({
       ...techData,
