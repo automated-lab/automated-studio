@@ -1,3 +1,5 @@
+export const runtime = 'nodejs'
+
 import { NextResponse } from 'next/server';
 import { analyzeWebsite } from '@/services/analysis/website';
 
@@ -16,7 +18,7 @@ export async function POST(req: Request) {
     const techData = await analyzeWebsite(url);
     
     // Get performance data from PageSpeed API
-    const pagespeedResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/lighthouse`, {
+    const pagespeedResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/lighthouse`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url })
