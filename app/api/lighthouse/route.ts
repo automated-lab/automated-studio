@@ -3,6 +3,11 @@ import { NextResponse } from 'next/server';
 const PAGESPEED_API_KEY = process.env.PAGESPEED_API_KEY;
 const API_URL = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
 
+interface LighthouseIssue {
+  id?: string;
+  description?: string;
+}
+
 export async function POST(req: Request) {
   const { url } = await req.json();
   const apiUrl = `${API_URL}?url=${encodeURIComponent(url)}&key=${PAGESPEED_API_KEY}&strategy=mobile&category=performance&category=accessibility&category=seo`;
@@ -38,7 +43,7 @@ export async function POST(req: Request) {
       },
       accessibility: {
         score: Math.round(lighthouseResult.categories.accessibility.score * 100),
-        issues: []
+        issues: [] as LighthouseIssue[]
       },
       seo: {
         score: Math.round(lighthouseResult.categories.seo.score * 100)
