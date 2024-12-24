@@ -8,24 +8,20 @@ export async function POST(req: Request) {
   const apiUrl = `${API_URL}?url=${encodeURIComponent(url)}&key=${PAGESPEED_API_KEY}&strategy=mobile&category=performance&category=accessibility&category=seo`;
   
   try {
-    const response = await fetch(apiUrl, {
-      headers: {
-        'Referer': process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-      }
-    });
+    const response = await fetch(apiUrl);
     const data = await response.json();
 
-    if (!response.ok) throw new Error(data.error?.message || 'API request failed');
-    
-    console.log('PageSpeed API response:', data);
-    
-    if (!data.lighthouseResult?.categories?.performance?.score) {
-      throw new Error('Invalid PageSpeed API response structure');
+    if (!response.ok) {
+      console.error('PageSpeed API error:', data);
+      throw new Error(data.error?.message || 'API request failed');
     }
-
+    
     const lighthouseResult = data.lighthouseResult;
     
+    if (!lighthouseResult?.categories?.performance?.score) {
+      throw new Error('Invalid PageSpeed API response');
+    }
+
     return NextResponse.json({
       performance: {
         score: Math.round(lighthouseResult.categories.performance.score * 100),
@@ -42,7 +38,8 @@ export async function POST(req: Request) {
       }
     });
   } catch (error) {
-    console.error('PageSpeed analysis failed:', error, '\nAPI URL:', apiUrl);
+    console.error('PageSpeed analysis failed:', error);
+    // Return zeros instead of throwing
     return NextResponse.json({
       performance: { score: 0, firstContentfulPaint: 0, loadTime: 0, speedScore: 0 },
       accessibility: { score: 0, issues: [] },
