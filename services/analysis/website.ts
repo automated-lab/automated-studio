@@ -40,16 +40,26 @@ export interface WebsiteAnalysis {
 export async function analyzeWebsite(url: string) {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
 
     const response = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; WebAnalyzer/1.0)',
+        'Accept': 'text/html,application/xhtml+xml',
+        'Accept-Language': 'en-US,en;q=0.5',
       },
-      signal: controller.signal
+      signal: controller.signal,
+      redirect: 'follow',
+    }).catch(error => {
+      throw new Error(`Fetch failed: ${error.message}`);
     });
 
     clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
     const html = await response.text();
     
     return {
