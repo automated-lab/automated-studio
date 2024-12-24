@@ -3,4 +3,11 @@
     "path": "/api/cron/calculate-metrics?api_key=${CRON_SECRET}",
     "schedule": "0 0 * * *"
   }]
+}
+{
+  "functions": {
+    "app/api/lighthouse/route.ts": {
+      "maxDuration": 60
+    }
+  }
 } 
