@@ -13,20 +13,25 @@ export async function POST(req: Request) {
   const apiUrl = `${API_URL}?url=${encodeURIComponent(url)}&key=${PAGESPEED_API_KEY}&strategy=mobile&category=performance&category=accessibility&category=seo`;
   
   try {
-    console.log('PageSpeed API URL:', apiUrl.replace(PAGESPEED_API_KEY, 'REDACTED'));
+    console.log('Starting PageSpeed analysis...');
     const response = await fetch(apiUrl, {
       headers: {
         'Referer': process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-      }
+      },
+      signal: AbortSignal.timeout(30000)
     });
+    
+    if (!response.ok) {
+      console.error('PageSpeed API error:', {
+        status: response.status,
+        statusText: response.statusText
+      });
+      throw new Error(`API request failed: ${response.status}`);
+    }
+    
     const data = await response.json();
     console.log('PageSpeed raw response:', JSON.stringify(data, null, 2));
 
-    if (!response.ok) {
-      console.error('PageSpeed API error:', data);
-      throw new Error(data.error?.message || 'API request failed');
-    }
-    
     const lighthouseResult = data.lighthouseResult;
     console.log('Lighthouse scores:', {
       performance: lighthouseResult?.categories?.performance?.score,
