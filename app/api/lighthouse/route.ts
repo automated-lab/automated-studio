@@ -14,7 +14,11 @@ export async function POST(req: Request) {
   
   try {
     console.log('PageSpeed API URL:', apiUrl.replace(PAGESPEED_API_KEY, 'REDACTED'));
-    const response = await fetch(apiUrl);
+    const response = await fetch(apiUrl, {
+      headers: {
+        'Referer': process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+      }
+    });
     const data = await response.json();
     console.log('PageSpeed raw response:', JSON.stringify(data, null, 2));
 
