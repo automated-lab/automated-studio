@@ -1,3 +1,6 @@
+export const dynamic = 'force-dynamic'
+export const runtime = 'edge' // optional
+
 import { NextResponse } from 'next/server';
 import { generateProposal } from '@/services/ai/generate';
 
