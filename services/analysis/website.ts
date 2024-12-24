@@ -39,13 +39,17 @@ export interface WebsiteAnalysis {
 
 export async function analyzeWebsite(url: string) {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
     const response = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; WebAnalyzer/1.0)',
       },
-      timeout: 5000
+      signal: controller.signal
     });
 
+    clearTimeout(timeoutId);
     const html = await response.text();
     
     return {
