@@ -1,4 +1,4 @@
-import axios from 'axios';
+import fetch from 'node-fetch';
 
 export interface WebsiteAnalysis {
   technologies: string[];
@@ -39,32 +39,25 @@ export interface WebsiteAnalysis {
 
 export async function analyzeWebsite(url: string) {
   try {
-    // Basic analysis
-    const response = await axios.get(url);
-    const html = response.data;
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; WebAnalyzer/1.0)',
+      },
+      timeout: 5000
+    });
+
+    const html = await response.text();
     
     return {
       technologies: detectTechnologies(html),
-      seoScore: 0, // Will be updated by Lighthouse
-      socialProfiles: findSocialLinks(html),
-      security: {
-        ssl: url.startsWith('https'),
-        headers: detectSecurityHeaders(response.headers),
-      },
-      content: {
-        ...extractMetadata(html),
-        pageCount: estimatePageCount(html),
-        wordCount: countWords(html),
-      },
-      accessibility: {
-        score: estimateAccessibilityScore(html),
-      },
-      analytics: detectAnalytics(html),
-      hosting: detectHosting(response.headers),
+      seoScore: calculateSEOScore(html),
+      socialProfiles: detectSocialProfiles(html),
+      security: { ssl: url.startsWith('https://') },
+      analytics: detectAnalytics(html)
     };
   } catch (error) {
     console.error('Website analysis failed:', error);
-    throw new Error('Failed to analyze website');
+    throw error;
   }
 }
 
@@ -174,4 +167,27 @@ function detectHosting(headers: any): { provider: string; location: string } {
   }
   
   return { provider: 'Unknown', location: 'Unknown' };
+}
+
+function calculateSEOScore(html: string): number {
+  let score = 100;
+  
+  if (!html.includes('<title>')) score -= 20;
+  if (!html.includes('meta name="description"')) score -= 20;
+  if (!html.includes('h1')) score -= 20;
+  if (!html.includes('alt=')) score -= 20;
+  if (!html.match(/<meta\s+name="keywords"/i)) score -= 20;
+  
+  return Math.max(0, score);
+}
+
+function detectSocialProfiles(html: string): string[] {
+  const socials = [];
+  
+  if (html.includes('facebook.com')) socials.push('Facebook');
+  if (html.includes('twitter.com')) socials.push('Twitter');
+  if (html.includes('instagram.com')) socials.push('Instagram');
+  if (html.includes('linkedin.com')) socials.push('LinkedIn');
+  
+  return socials;
 } 
