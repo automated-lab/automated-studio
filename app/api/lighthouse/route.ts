@@ -13,7 +13,7 @@ export async function POST(req: Request) {
   const apiUrl = `${API_URL}?url=${encodeURIComponent(url)}&key=${PAGESPEED_API_KEY}&strategy=mobile&category=performance&category=accessibility&category=seo`;
   
   try {
-    console.log('Fetching PageSpeed data for:', url);
+    console.log('PageSpeed API URL:', apiUrl.replace(PAGESPEED_API_KEY, 'REDACTED'));
     const response = await fetch(apiUrl);
     const data = await response.json();
     console.log('PageSpeed raw response:', JSON.stringify(data, null, 2));
