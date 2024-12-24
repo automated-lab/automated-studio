@@ -17,12 +17,13 @@ export async function POST(req: Request) {
 
   while (attempt < maxRetries) {
     try {
-      console.log(`Attempt ${attempt + 1} of ${maxRetries}...`);
+      console.log(`Attempt ${attempt + 1} of ${maxRetries} for URL: ${url}`);
       const response = await fetch(apiUrl, {
         headers: {
           'Referer': process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
         },
-        signal: AbortSignal.timeout(30000)
+        // Increased timeout
+        signal: AbortSignal.timeout(60000) // 60 seconds
       });
 
       if (response.ok) {
@@ -30,22 +31,30 @@ export async function POST(req: Request) {
         return NextResponse.json(data);
       }
       
-      console.error(`Attempt ${attempt + 1} failed:`, response.status);
+      console.error(`Attempt ${attempt + 1} failed with status:`, response.status);
       attempt++;
       
       if (attempt === maxRetries) {
-        throw new Error(`Failed after ${maxRetries} attempts`);
+        return NextResponse.json(
+          { error: 'PageSpeed API failed to respond' },
+          { status: 503 }
+        );
       }
       
-      // Wait 2 seconds before retrying
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Increased wait time between retries
+      await new Promise(resolve => setTimeout(resolve, 5000));
       
     } catch (error) {
       console.error(`Error on attempt ${attempt + 1}:`, error);
       attempt++;
       if (attempt === maxRetries) {
-        throw error;
+        return NextResponse.json(
+          { error: 'Analysis timed out' },
+          { status: 504 }
+        );
       }
+      // Wait longer between retries on timeout
+      await new Promise(resolve => setTimeout(resolve, 5000));
     }
   }
 } 
