@@ -2,7 +2,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useState, useEffect } from 'react'
 
 type Product = {
-  name: string
+  short_name: string
 }
 
 export function useProducts() {
@@ -14,8 +14,8 @@ export function useProducts() {
     async function fetchProducts() {
       const { data, error } = await supabase
         .from('products')
-        .select('name')
-        .order('name')
+        .select('short_name')
+        .order('short_name')
       
       if (!error) setData(data)
       setIsLoading(false)

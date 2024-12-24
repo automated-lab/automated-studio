@@ -70,6 +70,8 @@ export default function DashboardLayoutClient({
       "/dashboard": "Dashboard",
       "/clients": "Clients",
       "/automations": "Automations",
+      "/discounts": "Discounts",
+      "/proposals": "Proposal Generator",
       "/settings": "Settings",
       "/admin": "Admin Portal",
       "/prospects": "Prospecting",

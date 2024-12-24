@@ -21,6 +21,7 @@ export function DashboardHeader({ showMobileBack, onMobileBack }: DashboardHeade
       '/clients': 'Clients',
       '/automations': 'Automations',
       '/discounts': 'Discounts',
+      '/proposals': 'Proposal Generator',
       // Add more routes as needed
     }
     return routes[path] || 'Dashboard'

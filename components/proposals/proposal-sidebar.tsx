@@ -66,8 +66,8 @@ export function ProposalSidebar() {
   };
 
   return (
-    <div className="w-[400px] border-r h-full bg-background flex justify-center">
-      <div className="w-[360px] px-8 py-4 space-y-8 overflow-y-auto max-h-[calc(100vh-80px)]">
+    <div className="w-[400px] border-r h-[calc(100vh-8rem)] bg-background flex justify-center">
+      <div className="w-[360px] px-8 py-4 space-y-8 overflow-y-auto">
         <SidebarGroup>
           <SidebarGroupLabel className="text-base font-semibold mb-3">
             Data Collection

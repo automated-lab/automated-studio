@@ -8,10 +8,8 @@ import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useProducts } from "@/hooks/use-products";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Header } from "@/components/proposals/header";
 import {
   Select,
   SelectTrigger,
@@ -150,29 +148,29 @@ export function ProposalContent() {
                         <div>Loading products...</div>
                       ) : (
                         <>
-                          {products?.map((product: { name: string }) => (
+                          {products?.map((product: { short_name: string }) => (
                             <div
-                              key={product.name}
+                              key={product.short_name}
                               className="flex items-center space-x-2"
                             >
                               <Checkbox
-                                id={product.name}
+                                id={product.short_name}
                                 checked={businessContext.productTypes.includes(
-                                  product.name
+                                  product.short_name
                                 )}
                                 onCheckedChange={(checked) =>
                                   setBusinessContext((prev) => ({
                                     ...prev,
                                     productTypes: checked
-                                      ? [...prev.productTypes, product.name]
+                                      ? [...prev.productTypes, product.short_name]
                                       : prev.productTypes.filter(
-                                          (type) => type !== product.name
+                                          (type) => type !== product.short_name
                                         ),
                                   }))
                                 }
                               />
-                              <Label htmlFor={product.name}>
-                                {product.name}
+                              <Label htmlFor={product.short_name}>
+                                {product.short_name}
                               </Label>
                             </div>
                           ))}
@@ -359,7 +357,7 @@ export function ProposalContent() {
               <CardHeader>
                 <CardTitle>Generated Proposal</CardTitle>
               </CardHeader>
-              <CardContent className="h-[calc(100vh-12rem)] overflow-y-auto">
+              <CardContent className="h-[calc(100%-4rem)]">
                 {generating ? (
                   <div className="space-y-4">
                     <div className="space-y-2">
