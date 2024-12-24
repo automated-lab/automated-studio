@@ -1,26 +1,26 @@
-'use client'
-export const dynamic = 'force-dynamic'
+"use client";
+export const dynamic = "force-dynamic";
 
-import { ReactNode, useContext, useState } from "react"
-import { usePathname } from "next/navigation"
-import { User } from '@supabase/auth-helpers-nextjs'
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
-import { MainSidebar } from "@/components/dashboard/MainSidebar"
-import { Toaster } from "@/components/ui/toaster"
-import { useCopilotReadable } from "@copilotkit/react-core"
-import { CopilotPopup } from "@copilotkit/react-ui"
-import { DashboardContext } from "@/contexts/DashboardContext"
-import { Search } from "@/components/dashboard/overview/search"
-import { UserNav } from "@/components/dashboard/overview/user-nav"
+import { ReactNode, useContext, useState } from "react";
+import { usePathname } from "next/navigation";
+import { User } from "@supabase/auth-helpers-nextjs";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { MainSidebar } from "@/components/dashboard/MainSidebar";
+import { Toaster } from "@/components/ui/toaster";
+import { useCopilotReadable } from "@copilotkit/react-core";
+import { CopilotPopup } from "@copilotkit/react-ui";
+import { DashboardContext } from "@/contexts/DashboardContext";
+import { Search } from "@/components/dashboard/overview/search";
+import { UserNav } from "@/components/dashboard/overview/user-nav";
 
 export default function DashboardLayoutClient({
   children,
-  user
+  user,
 }: {
   children: ReactNode;
   user: User;
 }) {
-  const pathname = usePathname()
+  const pathname = usePathname();
   const [metrics, setMetrics] = useState({
     totalRevenue: 0,
     clientCount: 0,
@@ -31,8 +31,8 @@ export default function DashboardLayoutClient({
     productsChange: 0,
     newCustomers: 0,
     churnedCustomers: 0,
-    historicalRevenue: []
-  })
+    historicalRevenue: [],
+  });
 
   const [prospects, setProspects] = useState<{
     searchResults: Array<{
@@ -57,34 +57,36 @@ export default function DashboardLayoutClient({
   }>({
     searchResults: [],
     totalResults: 0,
-    currentQuery: ''
-  })
+    currentQuery: "",
+  });
 
   useCopilotReadable({
     description: "Dashboard metrics and user information",
-    value: { metrics, prospects, user }
-  })
+    value: { metrics, prospects, user },
+  });
 
   const getPageTitle = (path: string) => {
     const routes: Record<string, string> = {
-      '/dashboard': 'Dashboard',
-      '/clients': 'Clients',
-      '/automations': 'Automations',
-      '/settings': 'Settings',
-      '/admin': 'Admin Portal',
-      '/prospects': 'Prospecting',
+      "/dashboard": "Dashboard",
+      "/clients": "Clients",
+      "/automations": "Automations",
+      "/settings": "Settings",
+      "/admin": "Admin Portal",
+      "/prospects": "Prospecting",
       // Add more routes as needed
-    }
-    return routes[path] || 'Dashboard'
-  }
+    };
+    return routes[path] || "Dashboard";
+  };
 
   return (
-    <DashboardContext.Provider value={{ 
-      metrics, 
-      setMetrics,
-      prospectsState: prospects,
-      setProspectsState: setProspects 
-    }}>
+    <DashboardContext.Provider
+      value={{
+        metrics,
+        setMetrics,
+        prospectsState: prospects,
+        setProspectsState: setProspects,
+      }}
+    >
       <SidebarProvider>
         <MainSidebar />
         <SidebarInset className="h-screen overflow-hidden">
@@ -102,14 +104,14 @@ export default function DashboardLayoutClient({
               </div>
             </div>
             {/* Scrollable content */}
-            <div className="flex-1 overflow-hidden">
-              {children}
+            <div className="flex-1 overflow-hidden flex">
+              <div className="w-full">{children}</div>
             </div>
           </div>
         </SidebarInset>
-          <CopilotPopup defaultOpen={false} />
+        <CopilotPopup defaultOpen={false} />
         <Toaster />
       </SidebarProvider>
     </DashboardContext.Provider>
-  )
-} 
+  );
+}

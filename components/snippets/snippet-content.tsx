@@ -8,6 +8,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import React from 'react'
 import Image from "next/image"
+import { Card, CardContent } from "@/components/ui/card"
 
 interface SnippetContentProps {
   snippet: Snippet | null
@@ -101,27 +102,34 @@ export function SnippetContent({ snippet }: SnippetContentProps) {
             {snippet.attachments && snippet.attachments.length > 0 && (
               <>
                 <Separator />
-                <div>
+                <div className="pb-20">
                   <h2 className="text-lg font-semibold mb-4">Attachments</h2>
                   <div className="grid gap-4">
                     {snippet.attachments.map((attachment: any) => (
-                      <div
-                        key={attachment.id}
-                        className="flex items-center justify-between p-4 border rounded-lg"
-                      >
-                        <div className="flex items-center gap-2">
-                          <FileText className="w-4 h-4 text-muted-foreground" />
-                          <span className="text-sm">{attachment.filename}</span>
-                        </div>
-                        <Button 
-                          size="sm"
-                          onClick={() => handleDownload(attachment.url, attachment.filename)}
-                          className="flex items-center gap-2"
-                        >
-                          <Download className="w-4 h-4" />
-                          Download
-                        </Button>
-                      </div>
+                       <Card key={attachment.id}>
+                       <CardContent className="flex items-center justify-between p-4">
+                         <div className="flex items-center gap-3">
+                           <div className="p-2 rounded-lg bg-muted">
+                             <FileText className="w-4 h-4 text-muted-foreground" />
+                           </div>
+                           <div className="space-y-1">
+                             <p className="text-sm font-medium">{attachment.filename}</p>
+                             <p className="text-xs text-muted-foreground">
+                               {attachment.type || 'Document'}
+                             </p>
+                           </div>
+                         </div>
+                         <Button 
+                           size="sm"
+                           variant="secondary"
+                           onClick={() => handleDownload(attachment.url, attachment.filename)}
+                           className="ml-4"
+                         >
+                           <Download className="w-4 h-4 mr-2" />
+                           Download
+                         </Button>
+                       </CardContent>
+                     </Card>
                     ))}
                   </div>
                 </div>

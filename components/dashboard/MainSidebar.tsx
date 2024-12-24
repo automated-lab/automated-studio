@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   AudioWaveform,
   BookOpen,
@@ -26,12 +26,12 @@ import {
   Brain,
   Search,
   Users,
-} from "lucide-react"
-import { usePathname } from "next/navigation"
-import { User } from "@supabase/supabase-js"
-import { createClient } from "@/libs/supabase/client"
-import { useState, useEffect } from "react"
-import Image from "next/image"
+} from "lucide-react";
+import { usePathname } from "next/navigation";
+import { User } from "@supabase/supabase-js";
+import { createClient } from "@/libs/supabase/client";
+import { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   Sidebar,
   SidebarContent,
@@ -41,35 +41,38 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-} from "@/components/ui/sidebar"
-import { NavMain } from "@/components/shipfast/nav-main"
-import { NavProjects } from "@/components/shipfast/nav-projects"
-import { NavUser } from "@/components/shipfast/nav-user"
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { NavMain } from "@/components/shipfast/nav-main";
+import { NavProjects } from "@/components/shipfast/nav-projects";
+import { NavUser } from "@/components/shipfast/nav-user";
 
-const supabase = createClient()
+const supabase = createClient();
 
 export function MainSidebar() {
-  const pathname = usePathname()
-  const [user, setUser] = useState<User & { is_admin?: boolean }>(null)
+  const pathname = usePathname();
+  const [user, setUser] = useState<User & { is_admin?: boolean }>(null);
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) {
         const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single()
-        
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
+
         setUser({
           ...user,
-          is_admin: profile?.is_admin || false
-        })
+          is_admin: profile?.is_admin || false,
+        });
       }
-    }
-    getUser()
-  }, [])
+    };
+    getUser();
+  }, []);
 
   const data = {
     navMain: [
@@ -77,65 +80,65 @@ export function MainSidebar() {
         title: "Dashboard",
         url: "/dashboard",
         icon: LayoutDashboard,
-        isActive: pathname === "/dashboard"
+        isActive: pathname === "/dashboard",
       },
       {
         title: "Clients",
         url: "/clients",
         icon: Users,
-        isActive: pathname.startsWith("/clients")
+        isActive: pathname.startsWith("/clients"),
       },
       {
         title: "Discounts",
         url: "/discounts",
         icon: DollarSign,
-        isActive: pathname.startsWith("/discounts")
-      }        
+        isActive: pathname.startsWith("/discounts"),
+      },
     ],
     applications: [
       {
         name: "GHL",
         url: "/ghl",
         icon: SquareArrowUp,
-        isActive: pathname.startsWith("/ghl")
+        isActive: pathname.startsWith("/ghl"),
       },
       {
         name: "Website Chatbots",
         url: "#",
         icon: Bot,
-        isActive: false
+        isActive: false,
       },
       {
         name: "Social Media Bots",
         url: "#",
         icon: Bot,
-        isActive: false
+        isActive: false,
       },
       {
         name: "Reputation Management",
         url: "#",
         icon: Star,
-        isActive: false
-      }
+        isActive: false,
+      },
     ],
     resources: [
       {
         name: "Automations",
         url: "/automations",
         icon: Bot,
-        isActive: pathname.startsWith("/automations")
+        isActive: pathname.startsWith("/automations"),
       },
       {
         name: "Code Snippets",
         url: "/snippets",
         icon: Code,
-        isActive: pathname.startsWith("/snippets")
+        isActive: pathname.startsWith("/snippets"),
       },
       {
         name: "Documents",
         url: "/documents",
         icon: FileStack,
-        isActive: pathname.startsWith("/documents")
+        isActive: pathname.startsWith("/documents"),
       },
     ],
     tools: [
@@ -143,63 +146,63 @@ export function MainSidebar() {
         name: "Prospecting",
         url: "/prospects",
         icon: Search,
-        isActive: pathname.startsWith("/prospects")
+        isActive: pathname.startsWith("/prospects"),
       },
       {
         name: "Proposal Generator",
-        url: "/dashboard/proposal-generator",
+        url: "/proposals",
         icon: FileText,
-        isActive: pathname === "/dashboard/proposal-generator"
+        isActive: pathname === "/proposals",
       },
       {
         name: "Bot Prompt Generator",
         url: "/dashboard/bot-prompting",
         icon: Bot,
-        isActive: pathname === "/dashboard/bot-prompting"
+        isActive: pathname === "/dashboard/bot-prompting",
       },
       {
         name: "Bot Showcase Tool",
         url: "/dashboard/bot-showcase",
         icon: Bot,
-        isActive: pathname === "/dashboard/bot-showcase"
+        isActive: pathname === "/dashboard/bot-showcase",
       },
       {
         name: "Link Analytics",
         url: "#",
         icon: Link,
-        isActive: false
+        isActive: false,
       },
       {
         name: "Calendar Scheduling",
         url: "#",
         icon: Calendar1,
-        isActive: false
+        isActive: false,
       },
       {
         name: "AI Content",
         url: "#",
         icon: Brain,
-        isActive: false
+        isActive: false,
       },
       {
         name: "Social Media Scheduling",
         url: "#",
         icon: Calendar1,
-        isActive: false
-      }
+        isActive: false,
+      },
     ],
     bottomNav: [
       {
         name: "AI Copilot",
         url: "/chat",
         icon: Bot,
-        isActive: pathname.startsWith("/chat")
-      },      
+        isActive: pathname.startsWith("/chat"),
+      },
     ],
-  }
+  };
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" variant="floating">
       <SidebarHeader>
         <div className="flex h-[52px] items-center justify-center px-4">
           <Image
@@ -213,31 +216,27 @@ export function MainSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <nav className="grid gap-1">
-          <NavMain items={data.navMain} />          
+          <NavMain items={data.navMain} />
           <NavProjects projects={data.tools} label="Tools" />
-          <NavProjects projects={data.applications} label="White-label Applications" />
+          <NavProjects
+            projects={data.applications}
+            label="White-label Applications"
+          />
           <NavProjects projects={data.resources} label="Resources" />
         </nav>
         {/* <div className="mt-auto pt-4">
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <NavProjects projects={data.bottomNav} label="Copilot" />
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </div> */}
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <NavProjects projects={data.bottomNav} label="Copilot" />
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </div> */}
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={user ? {
-          name: user.email?.split('@')[0] || 'User',
-          email: user.email || '',
-          avatar: '',
-          initials: (user.email?.[0] || 'U').toUpperCase(),
-          is_admin: user.is_admin
-        } : null} />
-      </SidebarFooter>
+      <SidebarFooter></SidebarFooter>
+      <SidebarTrigger />
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }
