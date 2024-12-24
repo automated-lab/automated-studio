@@ -18,7 +18,7 @@ export async function POST(req: Request) {
       headers: {
         'Referer': process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
       },
-      signal: AbortSignal.timeout(30000)
+      signal: AbortSignal.timeout(60000)
     });
     
     if (!response.ok) {
