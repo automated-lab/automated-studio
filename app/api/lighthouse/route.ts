@@ -31,20 +31,20 @@ export async function POST(req: Request) {
 
     const data = await response.json();
     
-    // Validate and transform the data
+    // Validate and transform the data with rounded numbers
     const result = {
       performance: {
-        score: data.lighthouseResult?.categories?.performance?.score * 100 || 0,
-        firstContentfulPaint: data.lighthouseResult?.audits?.['first-contentful-paint']?.numericValue || 0,
-        speedScore: data.lighthouseResult?.categories?.performance?.score * 100 || 0,
-        loadTime: data.lighthouseResult?.audits?.['total-blocking-time']?.numericValue || 0
+        score: Math.round(data.lighthouseResult?.categories?.performance?.score * 100) || 0,
+        firstContentfulPaint: Number((data.lighthouseResult?.audits?.['first-contentful-paint']?.numericValue / 1000).toFixed(2)) || 0,
+        speedScore: Math.round(data.lighthouseResult?.categories?.performance?.score * 100) || 0,
+        loadTime: Number((data.lighthouseResult?.audits?.['total-blocking-time']?.numericValue / 1000).toFixed(2)) || 0
       },
       accessibility: {
-        score: data.lighthouseResult?.categories?.accessibility?.score * 100 || 0,
+        score: Math.round(data.lighthouseResult?.categories?.accessibility?.score * 100) || 0,
         issues: data.lighthouseResult?.audits?.accessibility?.details?.items || []
       },
       seo: {
-        score: data.lighthouseResult?.categories?.seo?.score * 100 || 0
+        score: Math.round(data.lighthouseResult?.categories?.seo?.score * 100) || 0
       }
     };
 
