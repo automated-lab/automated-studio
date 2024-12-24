@@ -13,10 +13,24 @@ export async function POST(req: Request) {
 
     try {
       const techData = await analyzeWebsite(url);
-      return NextResponse.json(techData);
+      
+      // Get performance data from PageSpeed API
+      const pagespeedResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/lighthouse`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      });
+      
+      const lighthouseData = await pagespeedResponse.json();
+      
+      return NextResponse.json({
+        ...techData,
+        performance: lighthouseData.performance,
+        accessibility: lighthouseData.accessibility,
+        seo: lighthouseData.seo
+      });
     } catch (analysisError) {
       console.error('Analysis failed:', analysisError);
-      // Return a fallback response instead of error
       return NextResponse.json({
         technologies: [],
         seoScore: 0,
