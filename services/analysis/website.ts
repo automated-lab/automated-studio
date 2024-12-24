@@ -125,7 +125,7 @@ function detectSecurityHeaders(headers: any): string[] {
 
 function estimatePageCount(html: string): number {
   const links = html.match(/<a\s+(?:[^>]*?\s+)?href=["']([^"']*)["']/g) || [];
-  const internalLinks = links.filter(link => 
+  const internalLinks = (links as string[]).filter(link =>
     !link.includes('http') || link.includes('localhost') || link.includes('havesomelemonde.com')
   );
   return Math.max(1, Math.ceil(internalLinks.length / 3)); // Rough estimate

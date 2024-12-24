@@ -12,7 +12,6 @@ const nextConfig = {
       "v5.airtableusercontent.com",
     ],
   },
-  output: 'standalone',
   webpack: (config) => {
     config.infrastructureLogging = {
       level: 'error'
