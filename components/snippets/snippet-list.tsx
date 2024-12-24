@@ -62,7 +62,7 @@ export function SnippetList({ selectedId, onSelect }: SnippetListProps) {
   }, {} as Record<string, Snippet[]>)
 
   return (
-    <div className="w-full md:w-[350px] lg:w-[550px] border-r h-full">
+    <div className="w-full md:w-[350px] lg:w-[550px] border-r h-[calc(100vh-4rem)]">
       <div className="h-full overflow-y-auto">
         <div className="space-y-6 p-4">
           {Object.entries(groupedSnippets).map(([category, categorySnippets]) => (

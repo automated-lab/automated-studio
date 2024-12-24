@@ -39,8 +39,8 @@ export function AutomationContent({ automation }: AutomationContentProps) {
   }
 
   return (
-    <div className="h-full overflow-y-auto">
-      <header className="sticky top-0 border-b bg-background p-4">
+    <div className="h-[calc(100vh-4rem)] flex flex-col">
+      <header className="border-b bg-background p-4">
         <div className="flex flex-col gap-4">
           <div>
             <h1 className="text-xl font-semibold">{automation.name}</h1>
